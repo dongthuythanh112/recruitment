@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUniqueSlug;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -100,6 +101,37 @@ class Job extends Model
         ];
     }
 
+    /**
+     * Tin ứng viên được thấy: đã duyệt và chưa quá hạn nộp hồ sơ.
+     */
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('status', self::STATUS_APPROVED)
+            ->where(fn (Builder $query) => $query->whereNull('deadline')->orWhereDate('deadline', '>=', today()));
+    }
+
+    /**
+     * Số ngày còn lại để nộp hồ sơ; null khi tin không đặt hạn.
+     */
+    public function daysLeft(): ?int
+    {
+        return $this->deadline ? (int) today()->diffInDays($this->deadline) : null;
+    }
+
+    public function isClosingSoon(): bool
+    {
+        return $this->daysLeft() !== null && $this->daysLeft() <= 7;
+    }
+
+    public function availabilityLabel(): string
+    {
+        return match ($this->daysLeft()) {
+            null => 'Đang mở',
+            0 => 'Hết hạn hôm nay',
+            default => "Còn {$this->daysLeft()} ngày",
+        };
+    }
+
     public function salaryRange(): string
     {
         $format = fn ($amount) => number_format((float) $amount, 0, ',', '.');
@@ -109,6 +141,25 @@ class Job extends Model
             $this->salary_min !== null && $this->salary_max !== null => $format($this->salary_min).' - '.$format($this->salary_max).' '.$currency,
             $this->salary_min !== null => 'Từ '.$format($this->salary_min).' '.$currency,
             $this->salary_max !== null => 'Đến '.$format($this->salary_max).' '.$currency,
+            default => 'Thỏa thuận',
+        };
+    }
+
+    /**
+     * Lương rút gọn cho bảng việc làm, ví dụ "12 - 18 triệu".
+     */
+    public function salaryShort(): string
+    {
+        if (($this->salary_currency ?? 'VND') !== 'VND') {
+            return $this->salaryRange();
+        }
+
+        $millions = fn ($amount) => rtrim(rtrim(number_format((float) $amount / 1000000, 1, ',', ''), '0'), ',');
+
+        return match (true) {
+            $this->salary_min !== null && $this->salary_max !== null => $millions($this->salary_min).' - '.$millions($this->salary_max).' triệu',
+            $this->salary_min !== null => 'Từ '.$millions($this->salary_min).' triệu',
+            $this->salary_max !== null => 'Đến '.$millions($this->salary_max).' triệu',
             default => 'Thỏa thuận',
         };
     }

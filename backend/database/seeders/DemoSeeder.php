@@ -32,7 +32,7 @@ class DemoSeeder extends Seeder
 
         $company = Company::firstOrCreate(
             ['name' => 'Công ty TNHH Công nghệ Sao Việt'],
-            ['address' => '12 Duy Tân, Cầu Giấy, Hà Nội', 'company_size' => '50-100', 'created_by' => $admin->id],
+            ['address' => 'Duy Tân, Cầu Giấy, Hà Nội', 'company_size' => '50-100', 'email' => 'tuyendung@saoviet.test', 'created_by' => $admin->id],
         );
 
         $recruiter = $this->recruiter('Trần Minh Anh', 'tuyendung@saoviet.test', $company, 'Trưởng phòng nhân sự');
@@ -72,6 +72,59 @@ class DemoSeeder extends Seeder
             ['job_id' => $approved->id, 'candidate_id' => $candidate->id],
             ['resume_id' => $resume->id, 'status' => 'reviewing'],
         );
+
+        $this->publishedJobs($admin, $marketing, $accounting, $skills->all());
+    }
+
+    /**
+     * Các tin đã duyệt của nhiều công ty để trang chủ có nội dung.
+     *
+     * @param  array<string, int>  $skills
+     */
+    private function publishedJobs(User $admin, Industry $marketing, Industry $accounting, array $skills): void
+    {
+        $sales = Industry::firstOrCreate(['name' => 'Bán hàng']);
+        $logistics = Industry::firstOrCreate(['name' => 'Vận tải - Logistics']);
+        $design = Industry::firstOrCreate(['name' => 'Thiết kế']);
+
+        $listings = [
+            ['Công ty CP Truyền thông Mây Xanh', 'tuyendung@mayxanh.test', [
+                ['Trưởng nhóm Digital Marketing', $marketing, 'TP. Hồ Chí Minh', 20000000, 35000000, 'hybrid', [$skills['SEO']]],
+                ['Nhân viên Content Marketing', $marketing, 'TP. Hồ Chí Minh', 10000000, 15000000, 'onsite', [$skills['SEO'], $skills['Giao tiếp']]],
+            ]],
+            ['Công ty TNHH Kế toán Thành Tín', 'tuyendung@thanhtin.test', [
+                ['Kế toán tổng hợp', $accounting, 'Hà Nội', 12000000, 18000000, 'onsite', [$skills['Giao tiếp']]],
+                ['Kiểm toán viên', $accounting, 'Đà Nẵng', 18000000, null, 'onsite', []],
+            ]],
+            ['Công ty CP Bán lẻ Phố Mới', 'tuyendung@phomoi.test', [
+                ['Nhân viên kinh doanh', $sales, 'Hà Nội', 9000000, 20000000, 'onsite', [$skills['Giao tiếp']]],
+                ['Quản lý cửa hàng', $sales, 'Hải Phòng', null, null, 'onsite', [$skills['Giao tiếp']]],
+            ]],
+            ['Công ty TNHH Giao vận Đường Dài', 'tuyendung@duongdai.test', [
+                ['Điều phối vận tải', $logistics, 'Bình Dương', 11000000, 16000000, 'onsite', []],
+            ]],
+            ['Công ty CP Thiết kế Nắng Mới', 'tuyendung@nangmoi.test', [
+                ['Thiết kế đồ họa', $design, 'Đà Nẵng', 12000000, 20000000, 'remote', []],
+            ]],
+        ];
+
+        foreach ($listings as [$companyName, $email, $jobs]) {
+            $company = Company::firstOrCreate(['name' => $companyName], ['email' => $email, 'created_by' => $admin->id]);
+            $recruiter = $this->recruiter('Phòng Nhân sự', $email, $company, 'Chuyên viên tuyển dụng');
+
+            foreach ($jobs as [$title, $industry, $location, $salaryMin, $salaryMax, $workplace, $skillIds]) {
+                $job = $this->job($recruiter, $company, $industry, $title, $skillIds, [
+                    'location' => $location,
+                    'salary_min' => $salaryMin,
+                    'salary_max' => $salaryMax,
+                    'workplace_type' => $workplace,
+                ]);
+
+                if ($job->status === Job::STATUS_PENDING) {
+                    $job->moderate(JobModerationHistory::ACTION_APPROVE, $admin);
+                }
+            }
+        }
     }
 
     private function recruiter(string $name, string $email, Company $company, string $position): RecruiterProfile
@@ -99,8 +152,9 @@ class DemoSeeder extends Seeder
 
     /**
      * @param  array<int, int>  $skillIds
+     * @param  array<string, mixed>  $overrides
      */
-    private function job(RecruiterProfile $recruiter, Company $company, Industry $industry, string $title, array $skillIds): Job
+    private function job(RecruiterProfile $recruiter, Company $company, Industry $industry, string $title, array $skillIds, array $overrides = []): Job
     {
         $job = Job::firstOrCreate(['title' => $title], [
             'company_id' => $company->id,
@@ -117,6 +171,7 @@ class DemoSeeder extends Seeder
             'quantity' => 2,
             'deadline' => now()->addMonth(),
             'status' => Job::STATUS_PENDING,
+            ...$overrides,
         ]);
 
         $job->skills()->syncWithoutDetaching(

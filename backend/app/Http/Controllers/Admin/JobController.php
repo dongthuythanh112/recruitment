@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Industry;
 use App\Models\Job;
 use App\Models\Skill;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,21 +16,35 @@ use Illuminate\View\View;
 
 class JobController extends Controller
 {
+    /**
+     * Thứ tự các tab trạng thái trên màn quản lý tin.
+     */
+    private const STATUS_TABS = [
+        Job::STATUS_PENDING,
+        Job::STATUS_APPROVED,
+        Job::STATUS_REJECTED,
+        Job::STATUS_HIDDEN,
+        Job::STATUS_CLOSED,
+        Job::STATUS_DRAFT,
+    ];
+
     public function index(Request $request): View
     {
-        $jobs = Job::with(['company', 'industry', 'creator'])
+        $status = in_array($request->query('status'), self::STATUS_TABS, true) ? $request->query('status') : null;
+
+        $jobs = $this->filteredJobs($request)
+            ->with(['company', 'industry', 'creator'])
             ->withCount('applications')
-            ->when($request->query('q'), fn ($query, $keyword) => $query->where('title', 'like', "%{$keyword}%"))
-            ->when($request->query('status'), fn ($query, $status) => $query->where('status', $status))
-            ->when($request->query('industry_id'), fn ($query, $industryId) => $query->where('industry_id', $industryId))
-            ->when($request->query('company_id'), fn ($query, $companyId) => $query->where('company_id', $companyId))
-            ->when($request->query('created_by'), fn ($query, $userId) => $query->where('created_by', $userId))
-            ->latest()
+            ->when($status, fn ($query) => $query->where('status', $status))
+            // Tab chờ duyệt là hàng đợi: tin gửi sớm nhất được xử lý trước.
+            ->when($status === Job::STATUS_PENDING, fn ($query) => $query->oldest(), fn ($query) => $query->latest())
             ->paginate(15)
             ->withQueryString();
 
         return view('admin.jobs.index', [
             'jobs' => $jobs,
+            'status' => $status,
+            'tabs' => $this->statusTabs($request, $status),
             'industries' => Industry::orderBy('name')->pluck('name', 'id'),
             'companies' => Company::orderBy('name')->pluck('name', 'id'),
         ]);
@@ -95,6 +110,50 @@ class JobController extends Controller
         $job->delete();
 
         return redirect()->route('admin.jobs.index')->with('success', 'Đã xóa tin tuyển dụng.');
+    }
+
+    /**
+     * Các bộ lọc dùng chung cho danh sách và số đếm trên tab, trừ trạng thái.
+     */
+    private function filteredJobs(Request $request): Builder
+    {
+        return Job::query()
+            ->when($request->query('q'), fn ($query, $keyword) => $query->where('title', 'like', "%{$keyword}%"))
+            ->when($request->query('industry_id'), fn ($query, $industryId) => $query->where('industry_id', $industryId))
+            ->when($request->query('company_id'), fn ($query, $companyId) => $query->where('company_id', $companyId))
+            ->when($request->query('created_by'), fn ($query, $userId) => $query->where('created_by', $userId));
+    }
+
+    /**
+     * @return array<string, array{label: string, count: int, url: string, active: bool}>
+     */
+    private function statusTabs(Request $request, ?string $status): array
+    {
+        $counts = $this->filteredJobs($request)
+            ->toBase()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $filters = array_filter($request->only(['q', 'industry_id', 'company_id', 'created_by']));
+
+        $tabs = ['all' => [
+            'label' => 'Tất cả',
+            'count' => (int) $counts->sum(),
+            'url' => route('admin.jobs.index', $filters),
+            'active' => $status === null,
+        ]];
+
+        foreach (self::STATUS_TABS as $tab) {
+            $tabs[$tab] = [
+                'label' => Job::STATUS_LABELS[$tab],
+                'count' => (int) ($counts[$tab] ?? 0),
+                'url' => route('admin.jobs.index', [...$filters, 'status' => $tab]),
+                'active' => $status === $tab,
+            ];
+        }
+
+        return $tabs;
     }
 
     /**

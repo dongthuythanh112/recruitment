@@ -26,7 +26,7 @@ class StatisticController extends Controller
                 ['label' => 'Nhà tuyển dụng', 'value' => User::where('role', User::ROLE_RECRUITER)->count(), 'url' => route('admin.recruiters.index')],
                 ['label' => 'Công ty', 'value' => Company::count(), 'url' => null],
                 ['label' => 'Tin tuyển dụng', 'value' => $jobCounts->sum(), 'url' => route('admin.jobs.index')],
-                ['label' => 'Tin chờ duyệt', 'value' => (int) ($jobCounts[Job::STATUS_PENDING] ?? 0), 'url' => route('admin.job-moderation.index')],
+                ['label' => 'Tin chờ duyệt', 'value' => (int) ($jobCounts[Job::STATUS_PENDING] ?? 0), 'url' => route('admin.jobs.index', ['status' => Job::STATUS_PENDING])],
                 ['label' => 'Lượt ứng tuyển', 'value' => Application::count(), 'url' => null],
             ],
             'jobsByStatus' => $this->ranked(Job::STATUS_LABELS, $jobCounts),

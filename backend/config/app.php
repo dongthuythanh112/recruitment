@@ -15,6 +15,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Địa chỉ nhận yêu cầu đăng tin từ nhà tuyển dụng, hiện trên trang chủ.
+    'contact_email' => env('CONTACT_EMAIL', 'lienhe@gaviec.example'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

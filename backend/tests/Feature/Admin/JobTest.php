@@ -62,6 +62,39 @@ class JobTest extends AdminTestCase
         $this->get("/admin/jobs?created_by={$recruiter->user_id}")->assertOk()->assertSee('Tin Một')->assertDontSee('Tin Hai');
     }
 
+    public function test_tab_counts_follow_other_filters_but_not_the_selected_status(): void
+    {
+        $this->job(['title' => 'Kế toán A']);
+        $this->job(['title' => 'Kế toán B', 'status' => Job::STATUS_APPROVED]);
+        $this->job(['title' => 'Lái xe', 'status' => Job::STATUS_APPROVED]);
+
+        $tabs = $this->get('/admin/jobs?status=approved')->viewData('tabs');
+        $this->assertSame(3, $tabs['all']['count']);
+        $this->assertSame(1, $tabs['pending']['count']);
+        $this->assertSame(2, $tabs['approved']['count']);
+        $this->assertSame(0, $tabs['rejected']['count']);
+        $this->assertTrue($tabs['approved']['active']);
+        $this->assertFalse($tabs['all']['active']);
+
+        $tabs = $this->get('/admin/jobs?q=K%E1%BA%BF')->viewData('tabs');
+        $this->assertSame(2, $tabs['all']['count']);
+        $this->assertSame(1, $tabs['approved']['count']);
+        $this->assertStringContainsString('q=', $tabs['pending']['url']);
+    }
+
+    public function test_filter_form_stays_on_the_current_tab(): void
+    {
+        $this->get('/admin/jobs?status=approved')->assertSee('name="status" value="approved"', false);
+    }
+
+    public function test_unknown_status_falls_back_to_all_jobs(): void
+    {
+        $this->job(['title' => 'Tin Một']);
+
+        $this->get('/admin/jobs?status=khong-co')->assertOk()->assertSee('Tin Một');
+        $this->get('/admin/jobs?status[]=approved')->assertOk()->assertSee('Tin Một');
+    }
+
     public function test_show_edit_create_render(): void
     {
         $job = $this->job();
