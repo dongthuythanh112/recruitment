@@ -7,6 +7,21 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Khu quản trị (Admin)
+
+Admin viết theo MVC bằng Blade tại `/admin`: controller ở `app/Http/Controllers/Admin`, view ở `resources/views/admin`, route ở `routes/web.php`.
+
+```bash
+cp .env.example .env        # đặt DB_CONNECTION=mysql và thông tin kết nối
+composer install
+php artisan key:generate
+php artisan migrate --seed  # tạo admin và dữ liệu mẫu (xem database/seeders)
+npm install --ignore-scripts && npm run build
+php artisan serve           # mở http://localhost:8000/admin
+```
+
+Bảng `jobs` là tin tuyển dụng; bảng queue của Laravel đã đổi tên thành `queue_jobs`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

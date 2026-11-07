@@ -114,4 +114,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Seeded Admin Account
+    |--------------------------------------------------------------------------
+    |
+    | Tài khoản quản trị do AdminSeeder tạo. Bắt buộc đặt ADMIN_PASSWORD trên production.
+    |
+    */
+
+    'admin' => [
+        'email' => env('ADMIN_EMAIL', 'admin@recruitment.test'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
 ];
