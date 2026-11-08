@@ -8,4 +8,265 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     /* Font hệ thống có đủ dấu tiếng Việt (Instrument Sans thì không). */
     --font-admin: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-client: 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --font-signage: 'Big Shoulders Display', 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+    --font-board: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+
+    --color-board: #16140f;
+    --color-tile: #2b271e;
+    --color-flap: #ffb000;
+    --color-paper: #f4efe3;
+    --color-ink: #1c1a14;
+    --color-signal: #b92f15;
+}
+
+/* Trang chủ: bảng việc làm kiểu bảng giờ tàu. */
+@layer components {
+    /* Mỗi ký tự nằm trên một ô lật: ô vẽ bằng gradient theo đúng độ rộng ký tự mono. */
+    .flap {
+        --cell: calc(1ch + 0.14em);
+        display: inline-block;
+        max-width: 100%;
+        font-family: var(--font-board);
+        font-size: 0.9375rem;
+        font-weight: 500;
+        line-height: 1.85;
+        letter-spacing: 0.14em;
+        white-space: nowrap;
+        text-transform: uppercase;
+        color: var(--color-flap);
+        background-image:
+            linear-gradient(transparent calc(50% - 0.5px), rgb(0 0 0 / 0.55) calc(50% - 0.5px), rgb(0 0 0 / 0.55) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+            linear-gradient(90deg, var(--color-tile) calc(100% - 2px), transparent calc(100% - 2px));
+        background-size: 100% 100%, var(--cell) 100%;
+    }
+
+    .flap-go {
+        color: #7fe0a8;
+    }
+
+    .flap-stop {
+        color: #ff8a6b;
+    }
+
+    .board-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        padding-inline: 0.375rem;
+        text-underline-offset: 4px;
+    }
+
+    .board-link:hover {
+        text-decoration: underline;
+    }
+
+    .board-field {
+        width: 100%;
+        min-height: 2.75rem;
+        padding-inline: 0.75rem;
+        border: 1px solid rgb(255 255 255 / 0.3);
+        border-radius: 0.25rem;
+        background: var(--color-board);
+        color: var(--color-paper);
+        font-size: 0.875rem;
+    }
+
+    .btn-flap,
+    .btn-outline,
+    .btn-ink {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        padding-inline: 1.25rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: translate 120ms, background-color 120ms, color 120ms;
+    }
+
+    .btn-flap {
+        background: var(--color-flap);
+        color: var(--color-ink);
+    }
+
+    .btn-outline {
+        border: 1px solid rgb(255 255 255 / 0.45);
+    }
+
+    .btn-outline:hover {
+        border-color: var(--color-flap);
+        color: var(--color-flap);
+    }
+
+    .btn-ink {
+        background: var(--color-ink);
+        color: var(--color-paper);
+    }
+
+    .btn-flap:hover,
+    .btn-ink:hover {
+        translate: 0 -1px;
+    }
+
+    .btn-flap:active,
+    .btn-ink:active {
+        translate: 0 1px;
+    }
+
+    /* Sơ đồ tuyến: mỗi ngành là một tuyến, mỗi ga là một vị trí đang mở. */
+    .transit-line {
+        display: block;
+        padding-block: 0.625rem;
+    }
+
+    .transit-track {
+        position: relative;
+        display: flex;
+        gap: 1.75rem;
+        align-items: center;
+        min-height: 1.25rem;
+        margin-top: 0.375rem;
+        padding-left: 0.25rem;
+        overflow: hidden;
+    }
+
+    .transit-track::before {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        top: 50%;
+        height: 0.375rem;
+        translate: 0 -50%;
+        border-radius: 999px;
+        background: var(--line);
+        transition: height 120ms;
+    }
+
+    .transit-line:hover .transit-track::before {
+        height: 0.625rem;
+    }
+
+    .transit-stop {
+        position: relative;
+        flex: none;
+        width: 1rem;
+        height: 1rem;
+        border: 3px solid var(--line);
+        border-radius: 999px;
+        background: var(--color-paper);
+    }
+
+    /* Ba ga đăng tin: đường ray nối các ga, dọc trên điện thoại và ngang từ md. */
+    .route {
+        counter-reset: stop;
+    }
+
+    .route-stop {
+        position: relative;
+        counter-increment: stop;
+        padding-left: 3.25rem;
+    }
+
+    .route-stop::before {
+        content: counter(stop);
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 999px;
+        background: var(--color-ink);
+        color: var(--color-flap);
+        font-family: var(--font-board);
+        font-weight: 600;
+    }
+
+    .route-stop:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 2.25rem;
+        bottom: -2rem;
+        left: 1.0625rem;
+        width: 0.25rem;
+        background: var(--color-ink);
+    }
+
+    @media (min-width: 48rem) {
+        .route-stop {
+            padding-top: 3rem;
+            padding-left: 0;
+        }
+
+        .route-stop:not(:last-child)::after {
+            top: 1rem;
+            bottom: auto;
+            left: 2.25rem;
+            right: -2rem;
+            width: auto;
+            height: 0.25rem;
+        }
+    }
+
+    /* Vé tuyển dụng ở trang chi tiết: đường xé răng cưa và mã vạch trang trí. */
+    .ticket {
+        border-radius: 0.5rem;
+        background: var(--color-paper);
+        color: var(--color-ink);
+    }
+
+    .ticket-tear {
+        position: relative;
+        border-top: 2px dashed rgb(28 26 20 / 0.35);
+    }
+
+    .ticket-tear::before,
+    .ticket-tear::after {
+        content: '';
+        position: absolute;
+        top: -0.625rem;
+        width: 1.125rem;
+        height: 1.125rem;
+        border-radius: 999px;
+        background: var(--color-board);
+    }
+
+    .ticket-tear::before {
+        left: -0.5625rem;
+    }
+
+    .ticket-tear::after {
+        right: -0.5625rem;
+    }
+
+    .ticket-barcode {
+        height: 2.5rem;
+        background: repeating-linear-gradient(90deg, var(--color-ink) 0 2px, transparent 2px 5px, var(--color-ink) 5px 6px, transparent 6px 9px, var(--color-ink) 9px 12px, transparent 12px 14px);
+    }
+
+    [data-enter] {
+        animation: enter 500ms ease-out both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-enter] {
+            animation: none;
+        }
+    }
+
+    @keyframes enter {
+        from {
+            opacity: 0;
+            translate: 0 12px;
+        }
+    }
+
+    .font-client :focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+    }
 }

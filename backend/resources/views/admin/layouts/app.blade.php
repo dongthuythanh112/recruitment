@@ -13,7 +13,6 @@
         ['label' => 'Ứng viên', 'route' => 'admin.candidates.index', 'active' => 'admin.candidates.*'],
         ['label' => 'Nhà tuyển dụng', 'route' => 'admin.recruiters.index', 'active' => 'admin.recruiters.*'],
         ['label' => 'Tin tuyển dụng', 'route' => 'admin.jobs.index', 'active' => 'admin.jobs.*'],
-        ['label' => 'Duyệt tin', 'route' => 'admin.job-moderation.index', 'active' => 'admin.job-moderation.*', 'count' => $pendingJobsCount],
         ['label' => 'Ngành nghề', 'route' => 'admin.industries.index', 'active' => 'admin.industries.*'],
     ];
 @endphp
@@ -23,14 +22,11 @@
         <nav class="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-1 lg:flex-col lg:overflow-visible">
             @foreach ($menu as $item)
                 <a href="{{ route($item['route']) }}" @class([
-                    'flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap',
+                    'rounded-md px-3 py-2 text-sm whitespace-nowrap',
                     'bg-teal-700 font-medium text-white' => request()->routeIs($item['active']),
                     'hover:bg-stone-800' => ! request()->routeIs($item['active']),
                 ])>
                     {{ $item['label'] }}
-                    @if (($item['count'] ?? 0) > 0)
-                        <span class="rounded-full bg-amber-300 px-2 text-xs font-semibold text-stone-900">{{ $item['count'] }}</span>
-                    @endif
                 </a>
             @endforeach
         </nav>

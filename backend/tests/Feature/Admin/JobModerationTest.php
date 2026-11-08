@@ -7,12 +7,41 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class JobModerationTest extends AdminTestCase
 {
-    public function test_queue_shows_only_pending_jobs(): void
+    public function test_pending_tab_is_a_queue_with_oldest_job_first(): void
     {
-        $this->job(['title' => 'Đang Chờ']);
         $this->job(['title' => 'Đã Xong', 'status' => Job::STATUS_APPROVED]);
+        $this->job(['title' => 'Gửi Trước'])->forceFill(['created_at' => now()->subDay()])->save();
+        $this->job(['title' => 'Gửi Sau']);
 
-        $this->get('/admin/job-moderation')->assertOk()->assertSee('Đang Chờ')->assertDontSee('Đã Xong');
+        $this->get('/admin/jobs?status=pending')
+            ->assertOk()
+            ->assertSeeInOrder(['Gửi Trước', 'Gửi Sau'])
+            ->assertDontSee('Đã Xong');
+    }
+
+    public function test_approve_button_only_appears_on_pending_jobs(): void
+    {
+        $pending = $this->job();
+        $approved = $this->job(['status' => Job::STATUS_APPROVED]);
+
+        $this->get('/admin/jobs')
+            ->assertSee(route('admin.jobs.moderate', $pending))
+            ->assertDontSee(route('admin.jobs.moderate', $approved));
+    }
+
+    public function test_approving_from_a_tab_returns_to_that_tab(): void
+    {
+        $job = $this->job();
+
+        $this->from('/admin/jobs?status=pending')
+            ->post("/admin/jobs/{$job->id}/moderate", ['action' => 'approve'])
+            ->assertRedirect('/admin/jobs?status=pending');
+    }
+
+    public function test_separate_moderation_screen_is_gone(): void
+    {
+        $this->get('/admin/job-moderation')->assertNotFound();
+        $this->get('/admin/statistics')->assertOk()->assertDontSee('Duyệt tin');
     }
 
     public function test_approve_publishes_and_records_history(): void

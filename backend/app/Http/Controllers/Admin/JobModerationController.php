@@ -8,23 +8,9 @@ use App\Models\JobModerationHistory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
 
 class JobModerationController extends Controller
 {
-    /**
-     * Hàng đợi duyệt: tin gửi sớm nhất được xử lý trước.
-     */
-    public function index(): View
-    {
-        $jobs = Job::with(['company', 'industry', 'creator'])
-            ->where('status', Job::STATUS_PENDING)
-            ->oldest()
-            ->paginate(15);
-
-        return view('admin.job-moderation.index', compact('jobs'));
-    }
-
     public function moderate(Request $request, Job $job): RedirectResponse
     {
         $data = $request->validate([
