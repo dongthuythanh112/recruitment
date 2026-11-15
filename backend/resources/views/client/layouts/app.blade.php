@@ -19,7 +19,7 @@
     <header class="sticky top-0 z-10 border-b border-white/10 bg-board">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
             <a href="{{ route('home') }}" class="flex min-h-11 items-center gap-2 font-signage text-2xl font-extrabold tracking-wide whitespace-nowrap uppercase">
-                <span aria-hidden="true" class="grid size-8 place-items-center rounded-full bg-flap text-lg text-ink">G</span>
+                <span aria-hidden="true" class="grid size-8 place-items-center rounded-full bg-flap text-lg text-ink">V</span>
                 Việc Ngon
             </a>
             <nav class="flex items-center gap-1 text-xs font-medium whitespace-nowrap sm:gap-4 sm:text-sm" aria-label="Điều hướng chính">
@@ -27,11 +27,16 @@
                 <a href="{{ route('home') }}#tuyen" class="board-link">Tuyến ngành</a>
                 <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link text-flap">Nhà tuyển dụng</a>
                 @auth
+                    @if (auth()->user()->role === \App\Models\User::ROLE_RECRUITER)
+                        <a href="{{ route('recruiter.jobs.index') }}" class="board-link text-flap">Quản lý tin</a>
+                        <a href="{{ route('recruiter.company.edit') }}" class="board-link">Công ty</a>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}" class="inline-flex">
                         @csrf
                         <button type="submit" class="board-link cursor-pointer text-flap">Đăng xuất</button>
                     </form>
                 @else
+                    <a href="{{ route('login') }}" class="board-link">Đăng nhập</a>
                     <a href="{{ route('register') }}" class="inline-flex min-h-9 items-center rounded bg-flap px-3 font-semibold text-ink transition hover:bg-white">Đăng ký</a>
                 @endauth
             </nav>

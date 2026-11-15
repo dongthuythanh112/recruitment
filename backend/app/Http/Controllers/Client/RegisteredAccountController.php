@@ -70,7 +70,15 @@ class RegisteredAccountController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Tạo tài khoản thành công. Chào mừng bạn đến với Việc Ngon!');
+        $destination = $user->role === User::ROLE_RECRUITER
+            ? route('recruiter.jobs.index')
+            : route('home');
+
+        $message = $user->role === User::ROLE_RECRUITER
+            ? 'Tài khoản nhà tuyển dụng đã sẵn sàng. Hãy tạo tin tuyển dụng đầu tiên.'
+            : 'Tạo tài khoản thành công. Chào mừng bạn đến với Việc Ngon!';
+
+        return redirect($destination)->with('success', $message);
     }
 
     public function destroy(Request $request): RedirectResponse
