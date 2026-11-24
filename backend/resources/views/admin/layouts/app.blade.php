@@ -41,11 +41,26 @@
     </aside>
 
     <main class="min-w-0 flex-1 px-4 py-6 lg:px-8">
-        <div class="mb-4 flex justify-end lg:hidden">
-            <form method="POST" action="{{ route('admin.logout') }}">
-                @csrf
-                <button type="submit" class="cursor-pointer text-sm text-stone-600 underline">Đăng xuất</button>
-            </form>
+        @php
+            $account = auth()->user();
+            $avatar = $account->candidateProfile?->avatar;
+        @endphp
+        <div class="mb-5 flex justify-end">
+            <div class="flex items-center gap-3">
+                @if ($avatar)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::url($avatar) }}" alt="Ảnh đại diện của {{ $account->name }}" class="size-9 rounded-full border border-stone-300 object-cover">
+                @else
+                    <span aria-hidden="true" class="grid size-9 place-items-center rounded-full bg-teal-700 text-sm font-semibold text-white">{{ mb_strtoupper(mb_substr($account->name, 0, 1)) }}</span>
+                @endif
+                <div class="min-w-0">
+                    <p class="max-w-48 truncate text-sm font-semibold text-stone-900" title="{{ $account->name }}">{{ $account->name }}</p>
+                    <p class="max-w-48 truncate text-xs text-stone-500">{{ $account->email }}</p>
+                </div>
+                <form method="POST" action="{{ route('admin.logout') }}">
+                    @csrf
+                    <button type="submit" class="cursor-pointer text-sm text-stone-600 underline hover:text-stone-900">Đăng xuất</button>
+                </form>
+            </div>
         </div>
 
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">

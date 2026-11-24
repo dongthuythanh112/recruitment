@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
+use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
 use App\Http\Controllers\Recruiter\JobController as RecruiterJobController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,11 @@ Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middl
 Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recruiter'])->group(function () {
     Route::get('thong-tin-cong-ty', [RecruiterCompanyController::class, 'edit'])->name('company.edit');
     Route::put('thong-tin-cong-ty', [RecruiterCompanyController::class, 'update'])->name('company.update');
+    Route::get('ung-vien', [RecruiterApplicationController::class, 'index'])->name('applications.index');
+    Route::get('ung-vien/{application}', [RecruiterApplicationController::class, 'show'])->name('applications.show');
+    Route::patch('ung-vien/{application}/trang-thai', [RecruiterApplicationController::class, 'updateStatus'])->name('applications.status');
+    Route::get('ung-vien/{application}/cv/{resume}/xem', [RecruiterApplicationController::class, 'viewResume'])->name('applications.resumes.view');
+    Route::get('ung-vien/{application}/cv/{resume}/tai', [RecruiterApplicationController::class, 'downloadResume'])->name('applications.resumes.download');
     Route::get('tin-tuyen-dung', [RecruiterJobController::class, 'index'])->name('jobs.index');
     Route::get('tin-tuyen-dung/tao', [RecruiterJobController::class, 'create'])->name('jobs.create');
     Route::post('tin-tuyen-dung', [RecruiterJobController::class, 'store'])->name('jobs.store');

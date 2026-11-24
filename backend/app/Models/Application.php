@@ -22,6 +22,17 @@ class Application extends Model
         'withdrawn' => 'Đã rút',
     ];
 
+    /** Các trạng thái nhà tuyển dụng được phép chọn khi xử lý hồ sơ. */
+    public const RECRUITER_STATUS_LABELS = [
+        'pending' => 'Chờ xử lý',
+        'reviewing' => 'Đang xem xét',
+        'shortlisted' => 'Vào danh sách ngắn',
+        'interview' => 'Phỏng vấn',
+        'offered' => 'Đã đề nghị',
+        'hired' => 'Đã tuyển',
+        'rejected' => 'Từ chối',
+    ];
+
     protected $fillable = [
         'job_id',
         'candidate_id',
