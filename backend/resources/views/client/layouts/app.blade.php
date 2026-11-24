@@ -34,7 +34,7 @@
                     @endif
                     @php
                         $account = auth()->user();
-                        $avatar = $account->candidateProfile?->avatar;
+                        $avatar = $account->role === \App\Models\User::ROLE_CANDIDATE ? $account->candidateProfile?->avatar : null;
                     @endphp
                     <details class="group relative ml-1 shrink-0 border-l border-white/15 pl-2 sm:ml-2 sm:pl-4">
                         <summary class="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded px-1 py-1 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-flap [&::-webkit-details-marker]:hidden">
@@ -47,6 +47,9 @@
                             <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-3 shrink-0 text-paper/70 transition group-open:rotate-180"><path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
                         </summary>
                         <div class="absolute right-0 top-full z-20 mt-2 hidden min-w-40 rounded border border-white/10 bg-stone-900 p-2 shadow-xl group-open:block">
+                            @if ($account->role === \App\Models\User::ROLE_RECRUITER)
+                                <a href="{{ route('recruiter.profile.edit') }}" class="block rounded px-3 py-2 text-sm font-medium text-paper hover:bg-white/10">Hồ sơ nhà tuyển dụng</a>
+                            @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full rounded px-3 py-2 text-left text-sm font-medium text-flap hover:bg-white/10">Đăng xuất</button>

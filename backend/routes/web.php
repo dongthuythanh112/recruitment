@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
+use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
 use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
 use App\Http\Controllers\Recruiter\JobController as RecruiterJobController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::middleware('guest')->group(function () {
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
 
 Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recruiter'])->group(function () {
+    Route::get('ho-so', [RecruiterProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('ho-so', [RecruiterProfileController::class, 'update'])->name('profile.update');
     Route::get('thong-tin-cong-ty', [RecruiterCompanyController::class, 'edit'])->name('company.edit');
     Route::put('thong-tin-cong-ty', [RecruiterCompanyController::class, 'update'])->name('company.update');
     Route::get('ung-vien', [RecruiterApplicationController::class, 'index'])->name('applications.index');
