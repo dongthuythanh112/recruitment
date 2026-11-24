@@ -49,6 +49,22 @@
                     </dl>
                 </div>
                 <div class="ticket-tear p-5">
+                    @if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_CANDIDATE)
+                        @if ($isSaved)
+                            <form method="POST" action="{{ route('candidate.saved-jobs.destroy', $job) }}" class="mb-3">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-outline w-full">Bỏ lưu việc làm</button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('candidate.saved-jobs.store', $job) }}" class="mb-3">
+                                @csrf
+                                <button type="submit" class="btn-outline w-full">Lưu việc làm</button>
+                            </form>
+                        @endif
+                    @elseif (!auth()->check())
+                        <a href="{{ route('login') }}" class="btn-outline mb-3 w-full">Đăng nhập để lưu việc</a>
+                    @endif
                     @if ($applyMail)
                         <a href="{{ $applyMail }}" class="btn-ink w-full">Gửi hồ sơ qua email</a>
                     @else

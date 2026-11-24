@@ -11,6 +11,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
+use App\Http\Controllers\Client\SavedJobController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
 use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
@@ -28,6 +29,12 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
+
+Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(function () {
+    Route::get('viec-da-luu', [SavedJobController::class, 'index'])->name('saved-jobs.index');
+    Route::post('viec-da-luu/{job}', [SavedJobController::class, 'store'])->name('saved-jobs.store');
+    Route::delete('viec-da-luu/{job}', [SavedJobController::class, 'destroy'])->name('saved-jobs.destroy');
+});
 
 Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recruiter'])->group(function () {
     Route::get('ho-so', [RecruiterProfileController::class, 'edit'])->name('profile.edit');

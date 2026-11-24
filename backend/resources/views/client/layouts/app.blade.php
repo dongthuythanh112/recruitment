@@ -49,6 +49,8 @@
                         <div class="absolute right-0 top-full z-20 mt-2 hidden min-w-40 rounded border border-white/10 bg-stone-900 p-2 shadow-xl group-open:block">
                             @if ($account->role === \App\Models\User::ROLE_RECRUITER)
                                 <a href="{{ route('recruiter.profile.edit') }}" class="block rounded px-3 py-2 text-sm font-medium text-paper hover:bg-white/10">Hồ sơ nhà tuyển dụng</a>
+                            @elseif ($account->role === \App\Models\User::ROLE_CANDIDATE)
+                                <a href="{{ route('candidate.saved-jobs.index') }}" class="block rounded px-3 py-2 text-sm font-medium text-paper hover:bg-white/10">Việc làm đã lưu</a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
