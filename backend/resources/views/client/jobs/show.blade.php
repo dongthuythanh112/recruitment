@@ -20,9 +20,6 @@
             ['Số lượng tuyển', $job->quantity ? $job->quantity.' người' : null, '＋'],
             ['Hạn nộp hồ sơ', $job->deadline?->format('d/m/Y'), '◷'],
         ], fn ($fact) => filled($fact[1]));
-        $applyMail = $company->email
-            ? 'mailto:'.$company->email.'?subject='.rawurlencode('Ứng tuyển: '.$job->title)
-            : null;
         $websiteUrl = $company->website && preg_match('#^https?://#i', $company->website) ? $company->website : null;
     @endphp
 
@@ -141,13 +138,25 @@
                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink/65">Sẵn sàng ứng tuyển?</p>
                         <p class="mt-1 font-signage text-3xl font-extrabold tracking-wide uppercase">Bắt đầu ngay</p>
                         <p class="mt-2 text-sm leading-6 text-ink/70">Gửi hồ sơ cho nhà tuyển dụng hoặc lưu tin để xem lại sau.</p>
-                        @if ($applyMail)
-                            <a href="{{ $applyMail }}" class="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-ink px-4 text-sm font-bold text-paper transition hover:bg-teal-900">
-                                Gửi hồ sơ qua email <span aria-hidden="true">↗</span>
-                            </a>
+                        @auth
+                            @if (auth()->user()->role === \App\Models\User::ROLE_CANDIDATE)
+                                @if ($application && $application->status !== 'withdrawn')
+                                    <div class="mt-5 rounded-xl border border-ink/15 bg-white/40 p-4">
+                                        <p class="text-sm font-bold">Bạn đã ứng tuyển vị trí này</p>
+                                        <p class="mt-1 text-xs text-ink/65">Trạng thái: {{ \App\Models\Application::STATUS_LABELS[$application->status] ?? $application->status }}</p>
+                                        <a href="{{ route('candidate.applications.index') }}" class="mt-2 inline-flex text-xs font-semibold underline underline-offset-4">Theo dõi hồ sơ</a>
+                                    </div>
+                                @else
+                                    <a href="{{ route('candidate.applications.create', $job) }}" class="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-sky-800 px-4 text-sm font-bold text-white transition hover:bg-sky-900">
+                                        Ứng tuyển ngay <span aria-hidden="true">→</span>
+                                    </a>
+                                @endif
+                            @else
+                                <p class="mt-5 rounded-xl bg-white/40 p-4 text-sm">Đăng nhập bằng tài khoản ứng viên để ứng tuyển vị trí này.</p>
+                            @endif
                         @else
-                            <p class="mt-5 rounded-lg bg-ink/10 p-3 text-sm">Công ty chưa cung cấp email nhận hồ sơ.</p>
-                        @endif
+                            <a href="{{ route('login', ['role' => 'candidate']) }}" class="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-sky-800 px-4 text-sm font-bold text-white transition hover:bg-sky-900">Đăng nhập để ứng tuyển</a>
+                        @endauth
                         @if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_CANDIDATE)
                             @if ($isSaved)
                                 <form method="POST" action="{{ route('candidate.saved-jobs.destroy', $job) }}" class="mt-3">

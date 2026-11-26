@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\JobModerationController;
 use App\Http\Controllers\Admin\RecruiterController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ApplicationController as CandidateApplicationController;
 use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
@@ -33,6 +34,10 @@ Route::middleware('guest')->group(function () {
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
 
 Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(function () {
+    Route::get('don-ung-tuyen', [CandidateApplicationController::class, 'index'])->name('applications.index');
+    Route::get('ung-tuyen/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
+    Route::post('ung-tuyen/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');
+    Route::patch('don-ung-tuyen/{application}/rut', [CandidateApplicationController::class, 'withdraw'])->name('applications.withdraw');
     Route::get('ho-so', [CandidateProfileController::class, 'edit'])->name('profile.edit');
     Route::put('ho-so', [CandidateProfileController::class, 'update'])->name('profile.update');
     Route::put('ho-so/ky-nang', [CandidateProfileController::class, 'updateSkills'])->name('profile.skills');

@@ -20,10 +20,14 @@ class JobController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        $candidateProfile = $request->user()?->role === User::ROLE_CANDIDATE
+            ? $request->user()->candidateProfile
+            : null;
+
         return view('client.jobs.show', [
             'job' => $job,
-            'isSaved' => $request->user()?->role === User::ROLE_CANDIDATE
-                && $request->user()->candidateProfile?->savedJobs()->whereKey($job->id)->exists(),
+            'isSaved' => $candidateProfile?->savedJobs()->whereKey($job->id)->exists() ?? false,
+            'application' => $candidateProfile?->applications()->where('job_id', $job->id)->first(),
             'relatedJobs' => Job::published()
                 ->with('company')
                 ->where('industry_id', $job->industry_id)
