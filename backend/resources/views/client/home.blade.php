@@ -29,8 +29,8 @@
     </section>
 
     <section id="viec-lam" class="mx-auto max-w-6xl scroll-mt-14 px-4 pb-14">
-        <div class="overflow-hidden rounded-lg border border-white/15 bg-black/30">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 px-4 py-3">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
                 <h2 class="font-signage text-3xl font-bold tracking-wide uppercase">
                     {{ $isFiltered ? 'Kết quả tìm kiếm ('.$jobs->total().')' : 'Việc đang tuyển' }}
                 </h2>
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('home') }}#viec-lam" role="search" class="grid gap-3 border-b border-white/15 px-4 py-3 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
+            <form method="GET" action="{{ route('home') }}#viec-lam" role="search" class="grid gap-3 border-b border-slate-200 bg-sky-50/70 px-4 py-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
                 <div>
                     <label for="q" class="mb-1 block text-xs text-paper/70">Vị trí hoặc công ty</label>
                     <input id="q" name="q" type="search" maxlength="100" value="{{ request()->query('q') }}" class="board-field">
@@ -68,7 +68,7 @@
                     {{ $isFiltered ? 'Không có việc làm nào khớp với tìm kiếm của bạn. Hãy thử từ khóa khác.' : 'Hiện chưa có việc làm nào đang tuyển.' }}
                 </p>
             @else
-                <div class="hidden grid-cols-[minmax(0,1fr)_11rem_12rem_11.5rem_1.25rem] gap-x-6 border-b border-white/15 px-4 py-2 text-xs tracking-wider text-paper/60 uppercase lg:grid" aria-hidden="true">
+                <div class="hidden grid-cols-[minmax(0,1fr)_11rem_12rem_11.5rem_1.25rem] gap-x-6 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs tracking-wider text-paper/60 uppercase lg:grid" aria-hidden="true">
                     <span>Vị trí</span><span>Nơi làm</span><span>Lương</span><span>Trạng thái</span>
                 </div>
                 @foreach ($jobs as $job)

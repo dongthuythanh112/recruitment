@@ -11,6 +11,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
+use App\Http\Controllers\Client\ResumeController as CandidateResumeController;
 use App\Http\Controllers\Client\SavedJobController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
@@ -31,6 +32,12 @@ Route::middleware('guest')->group(function () {
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
 
 Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(function () {
+    Route::get('cv', [CandidateResumeController::class, 'index'])->name('resumes.index');
+    Route::post('cv', [CandidateResumeController::class, 'store'])->name('resumes.store');
+    Route::get('cv/{resume}/xem', [CandidateResumeController::class, 'view'])->name('resumes.view');
+    Route::get('cv/{resume}/tai', [CandidateResumeController::class, 'download'])->name('resumes.download');
+    Route::patch('cv/{resume}/mac-dinh', [CandidateResumeController::class, 'setDefault'])->name('resumes.default');
+    Route::delete('cv/{resume}', [CandidateResumeController::class, 'destroy'])->name('resumes.destroy');
     Route::get('viec-da-luu', [SavedJobController::class, 'index'])->name('saved-jobs.index');
     Route::post('viec-da-luu/{job}', [SavedJobController::class, 'store'])->name('saved-jobs.store');
     Route::delete('viec-da-luu/{job}', [SavedJobController::class, 'destroy'])->name('saved-jobs.destroy');

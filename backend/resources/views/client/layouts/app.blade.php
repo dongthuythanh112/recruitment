@@ -8,7 +8,7 @@
     <meta property="og:title" content="@yield('title') - Việc Ngon">
     <meta property="og:description" content="@yield('description')">
     <meta property="og:type" content="website">
-    <meta name="theme-color" content="#16140f">
+    <meta name="theme-color" content="#f3f8fc">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="stylesheet" href="https://fonts.bunny.net/css?family=be-vietnam-pro:400,500,600|big-shoulders-display:700,800|ibm-plex-mono:500,600&display=swap">
     @vite(['resources/css/app.css', 'resources/js/client-board.js'])
@@ -16,7 +16,7 @@
 <body class="bg-board font-client text-paper antialiased">
     <a href="#noi-dung" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-20 focus:rounded focus:bg-flap focus:px-3 focus:py-2 focus:text-ink">Đến nội dung chính</a>
 
-    <header class="sticky top-0 z-10 border-b border-white/10 bg-board">
+    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
             <a href="{{ route('home') }}" class="flex min-h-11 items-center gap-2 font-signage text-2xl font-extrabold tracking-wide whitespace-nowrap uppercase">
                 <span aria-hidden="true" class="grid size-8 place-items-center rounded-full bg-flap text-lg text-ink">V</span>
@@ -46,15 +46,16 @@
                             <span class="max-w-20 truncate text-[11px] text-paper sm:max-w-28 sm:text-sm" title="{{ $account->name }}">{{ $account->name }}</span>
                             <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-3 shrink-0 text-paper/70 transition group-open:rotate-180"><path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
                         </summary>
-                        <div class="absolute right-0 top-full z-20 mt-2 hidden min-w-40 rounded border border-white/10 bg-stone-900 p-2 shadow-xl group-open:block">
+                        <div class="absolute right-0 top-full z-20 mt-2 hidden min-w-48 rounded-xl border border-slate-200 bg-white p-2 text-ink shadow-xl shadow-slate-900/10 group-open:block">
                             @if ($account->role === \App\Models\User::ROLE_RECRUITER)
-                                <a href="{{ route('recruiter.profile.edit') }}" class="block rounded px-3 py-2 text-sm font-medium text-paper hover:bg-white/10">Hồ sơ nhà tuyển dụng</a>
+                                <a href="{{ route('recruiter.profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Hồ sơ nhà tuyển dụng</a>
                             @elseif ($account->role === \App\Models\User::ROLE_CANDIDATE)
-                                <a href="{{ route('candidate.saved-jobs.index') }}" class="block rounded px-3 py-2 text-sm font-medium text-paper hover:bg-white/10">Việc làm đã lưu</a>
+                                <a href="{{ route('candidate.resumes.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Quản lý CV</a>
+                                <a href="{{ route('candidate.saved-jobs.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Việc làm đã lưu</a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="w-full rounded px-3 py-2 text-left text-sm font-medium text-flap hover:bg-white/10">Đăng xuất</button>
+                                <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-sky-800 hover:bg-sky-50">Đăng xuất</button>
                             </form>
                         </div>
                     </details>
@@ -76,7 +77,7 @@
         @yield('content')
     </main>
 
-    <footer class="border-t border-white/10 text-sm text-paper/70">
+    <footer class="border-t border-slate-200 bg-white text-sm text-paper/70">
         <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6">
             <span class="font-signage text-lg font-bold tracking-wide text-paper uppercase">Việc Ngon</span>
             <span>© {{ date('Y') }} Bảng việc làm cho người tìm việc và nơi cần người.</span>

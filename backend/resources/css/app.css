@@ -12,12 +12,35 @@
     --font-signage: 'Big Shoulders Display', 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
     --font-board: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
 
-    --color-board: #16140f;
-    --color-tile: #2b271e;
-    --color-flap: #ffb000;
-    --color-paper: #f4efe3;
-    --color-ink: #1c1a14;
-    --color-signal: #b92f15;
+    --color-board: #f3f8fc;
+    --color-tile: #c6e3f5;
+    --color-flap: #69b5e5;
+    --color-paper: #17344b;
+    --color-ink: #17344b;
+    --color-signal: #145d8c;
+}
+
+@layer utilities {
+    /* Paper stays a white surface; paper text follows the light theme's ink. */
+    .bg-paper { background-color: #fff; }
+    .font-client .text-white { color: var(--color-ink); }
+    .font-client .text-flap { color: #145d8c; }
+    .font-client .bg-ink.text-white,
+    .font-client .bg-ink .text-white,
+    .font-client .bg-teal-700.text-white,
+    .font-client .bg-sky-700.text-white,
+    .font-client .bg-sky-800.text-white { color: #fff; }
+    .font-client [class~="bg-ink"][class~="text-paper"] { color: #fff; }
+    .font-client [class~="bg-white/5"],
+    .font-client [class~="bg-white/8"],
+    .font-client [class~="bg-white/[0.045]"],
+    .font-client [class~="bg-black/20"],
+    .font-client [class~="bg-black/30"] { background-color: #fff; }
+    .font-client [class~="border-white/10"],
+    .font-client [class~="border-white/15"],
+    .font-client [class~="border-white/20"],
+    .font-client [class~="border-white/25"],
+    .font-client [class~="border-white/30"] { border-color: #d7e4ee; }
 }
 
 /* Trang chủ: bảng việc làm kiểu bảng giờ tàu. */
@@ -34,7 +57,7 @@
         letter-spacing: 0.14em;
         white-space: nowrap;
         text-transform: uppercase;
-        color: var(--color-flap);
+        color: #145d8c;
         background-image:
             linear-gradient(transparent calc(50% - 0.5px), rgb(0 0 0 / 0.55) calc(50% - 0.5px), rgb(0 0 0 / 0.55) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
             linear-gradient(90deg, var(--color-tile) calc(100% - 2px), transparent calc(100% - 2px));
@@ -42,11 +65,11 @@
     }
 
     .flap-go {
-        color: #7fe0a8;
+        color: #14764c;
     }
 
     .flap-stop {
-        color: #ff8a6b;
+        color: #b13a26;
     }
 
     .board-link {
@@ -65,10 +88,10 @@
         width: 100%;
         min-height: 2.75rem;
         padding-inline: 0.75rem;
-        border: 1px solid rgb(255 255 255 / 0.3);
+        border: 1px solid #bfd0dd;
         border-radius: 0.25rem;
-        background: var(--color-board);
-        color: var(--color-paper);
+        background: #fff;
+        color: var(--color-ink);
         font-size: 0.875rem;
     }
 
@@ -92,17 +115,17 @@
     }
 
     .btn-outline {
-        border: 1px solid rgb(255 255 255 / 0.45);
+        border: 1px solid #9eb7c9;
     }
 
     .btn-outline:hover {
         border-color: var(--color-flap);
-        color: var(--color-flap);
+        color: #145d8c;
     }
 
     .btn-ink {
         background: var(--color-ink);
-        color: var(--color-paper);
+        color: #fff;
     }
 
     .btn-flap:hover,
@@ -215,7 +238,7 @@
     /* Vé tuyển dụng ở trang chi tiết: đường xé răng cưa và mã vạch trang trí. */
     .ticket {
         border-radius: 0.5rem;
-        background: var(--color-paper);
+        background: #fff;
         color: var(--color-ink);
     }
 
