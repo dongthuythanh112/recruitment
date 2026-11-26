@@ -50,6 +50,7 @@
                             @if ($account->role === \App\Models\User::ROLE_RECRUITER)
                                 <a href="{{ route('recruiter.profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Hồ sơ nhà tuyển dụng</a>
                             @elseif ($account->role === \App\Models\User::ROLE_CANDIDATE)
+                                <a href="{{ route('candidate.profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Hồ sơ cá nhân</a>
                                 <a href="{{ route('candidate.resumes.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Quản lý CV</a>
                                 <a href="{{ route('candidate.saved-jobs.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Việc làm đã lưu</a>
                             @endif

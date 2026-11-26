@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
 use App\Http\Controllers\Client\RegisteredAccountController;
 use App\Http\Controllers\Client\ResumeController as CandidateResumeController;
+use App\Http\Controllers\Client\ProfileController as CandidateProfileController;
 use App\Http\Controllers\Client\SavedJobController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
@@ -32,6 +33,15 @@ Route::middleware('guest')->group(function () {
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
 
 Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(function () {
+    Route::get('ho-so', [CandidateProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('ho-so', [CandidateProfileController::class, 'update'])->name('profile.update');
+    Route::put('ho-so/ky-nang', [CandidateProfileController::class, 'updateSkills'])->name('profile.skills');
+    Route::post('ho-so/hoc-van', [CandidateProfileController::class, 'storeEducation'])->name('profile.education.store');
+    Route::put('ho-so/hoc-van/{education}', [CandidateProfileController::class, 'updateEducation'])->name('profile.education.update');
+    Route::delete('ho-so/hoc-van/{education}', [CandidateProfileController::class, 'destroyEducation'])->name('profile.education.destroy');
+    Route::post('ho-so/kinh-nghiem', [CandidateProfileController::class, 'storeExperience'])->name('profile.experience.store');
+    Route::put('ho-so/kinh-nghiem/{experience}', [CandidateProfileController::class, 'updateExperience'])->name('profile.experience.update');
+    Route::delete('ho-so/kinh-nghiem/{experience}', [CandidateProfileController::class, 'destroyExperience'])->name('profile.experience.destroy');
     Route::get('cv', [CandidateResumeController::class, 'index'])->name('resumes.index');
     Route::post('cv', [CandidateResumeController::class, 'store'])->name('resumes.store');
     Route::get('cv/{resume}/xem', [CandidateResumeController::class, 'view'])->name('resumes.view');
