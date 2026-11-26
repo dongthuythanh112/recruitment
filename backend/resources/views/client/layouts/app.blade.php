@@ -69,7 +69,18 @@
 
     <main id="noi-dung">
         @if (session('success'))
-            <div role="status" class="border-b border-emerald-900/15 bg-emerald-100 px-4 py-3 text-center text-sm font-medium text-emerald-950">{{ session('success') }}</div>
+            <div data-toast class="fixed inset-x-4 top-4 z-50 mx-auto flex max-w-md items-start gap-3 rounded-2xl border border-emerald-200 bg-white p-4 text-left text-emerald-950 shadow-xl shadow-slate-900/15 sm:inset-x-auto sm:right-5" role="status" aria-live="polite">
+                <span class="grid size-9 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="size-5"><path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.312a1 1 0 0 1-1.42.006l-3.75-3.688a1 1 0 1 1 1.403-1.426l3.04 2.987 6.557-6.611a1 1 0 0 1 1.414.006Z" clip-rule="evenodd" /></svg>
+                </span>
+                <div class="min-w-0 flex-1 pt-1">
+                    <p class="text-sm font-semibold">Thành công</p>
+                    <p class="mt-0.5 text-sm leading-5 text-slate-600">{{ session('success') }}</p>
+                </div>
+                <button type="button" data-toast-close aria-label="Đóng thông báo" class="grid size-8 shrink-0 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="M4.22 4.22a.75.75 0 0 1 1.06 0L10 8.94l4.72-4.72a.75.75 0 1 1 1.06 1.06L11.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06L10 11.06l-4.72 4.72a.75.75 0 1 1-1.06-1.06L8.94 10 4.22 5.28a.75.75 0 0 1 0-1.06Z" /></svg>
+                </button>
+            </div>
         @endif
         @if (session('error'))
             <div role="alert" class="border-b border-rose-900/15 bg-rose-100 px-4 py-3 text-center text-sm font-medium text-rose-950">{{ session('error') }}</div>

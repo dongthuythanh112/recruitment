@@ -4,14 +4,26 @@
 @section('description', 'Tải lên và quản lý các CV ứng tuyển của bạn.')
 
 @section('content')
-    <section class="mx-auto max-w-5xl px-4 py-10 sm:py-14">
-        <header class="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-6">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">Tài khoản ứng viên</p>
-                <h1 class="mt-2 font-signage text-4xl font-extrabold tracking-wide uppercase sm:text-5xl">Quản lý CV</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Tải CV lên để sử dụng khi ứng tuyển. Bạn có thể lưu nhiều phiên bản và chọn một CV mặc định.</p>
+    <section class="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+        <header class="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-sky-800 via-sky-700 to-cyan-600 px-5 py-7 text-white shadow-xl shadow-sky-900/15 sm:px-8 sm:py-9">
+            <div aria-hidden="true" class="absolute -right-12 -top-24 -z-10 size-72 rounded-full border-[36px] border-white/10 sm:size-96"></div>
+            <div class="flex flex-wrap items-end justify-between gap-6">
+                <div class="max-w-2xl">
+                    <p class="!text-white/75 text-xs font-semibold uppercase tracking-[0.18em]">Tài khoản ứng viên</p>
+                    <h1 class="mt-2 font-signage text-4xl font-extrabold tracking-wide uppercase !text-white sm:text-5xl">Quản lý CV</h1>
+                    <p class="mt-2 text-sm leading-6 !text-white/85">Lưu các phiên bản CV của bạn tại một nơi, sẵn sàng cho cơ hội tiếp theo.</p>
+                </div>
+                <div class="flex gap-3">
+                    <div class="min-w-24 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-center backdrop-blur-sm">
+                        <p class="text-2xl font-bold !text-white">{{ $resumes->count() }}</p>
+                        <p class="mt-0.5 text-[11px] !text-white/75">CV đã lưu</p>
+                    </div>
+                    <div class="min-w-24 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-center backdrop-blur-sm">
+                        <p class="text-2xl font-bold !text-white">{{ $resumes->where('is_default', true)->count() }}</p>
+                        <p class="mt-0.5 text-[11px] !text-white/75">CV mặc định</p>
+                    </div>
+                </div>
             </div>
-            <span class="grid size-14 place-items-center rounded-2xl bg-sky-100 text-2xl text-sky-800" aria-hidden="true">▤</span>
         </header>
 
         @if ($errors->any())
@@ -26,10 +38,14 @@
         <div class="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
             <div class="space-y-4">
                 @forelse ($resumes as $resume)
-                    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <article @class([
+                        'rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6',
+                        'border-sky-300 ring-2 ring-sky-100' => $resume->is_default,
+                        'border-slate-200' => ! $resume->is_default,
+                    ])>
                         <div class="flex flex-wrap items-start justify-between gap-4">
                             <div class="flex min-w-0 items-start gap-3">
-                                <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-sky-50 text-lg font-bold text-sky-800">PDF</span>
+                                <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 text-sm font-extrabold tracking-wide text-sky-800 ring-1 ring-sky-200/70">PDF</span>
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <h2 class="break-words font-semibold text-slate-900">{{ $resume->title }}</h2>
@@ -77,9 +93,9 @@
                 @endforelse
             </div>
 
-            <aside class="rounded-2xl border border-sky-200 bg-sky-50 p-5 sm:p-6">
-                <span class="text-xs font-semibold uppercase tracking-[0.16em] text-sky-800">Thêm hồ sơ</span>
-                <h2 class="mt-1 font-signage text-2xl font-extrabold tracking-wide uppercase">Tải CV lên</h2>
+            <aside class="rounded-2xl border border-sky-200 bg-gradient-to-b from-sky-50 to-white p-5 shadow-sm sm:sticky sm:top-24 sm:p-6">
+                <span class="inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-sky-900"><span aria-hidden="true">＋</span> Thêm hồ sơ</span>
+                <h2 class="mt-3 font-signage text-2xl font-extrabold tracking-wide uppercase">Tải CV lên</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-600">Hỗ trợ PDF, dung lượng tối đa 10 MB. CV đầu tiên sẽ được đặt làm mặc định.</p>
 
                 <form method="POST" action="{{ route('candidate.resumes.store') }}" enctype="multipart/form-data" class="mt-5 space-y-4">
@@ -91,7 +107,7 @@
                     </div>
                     <div>
                         <label for="file" class="mb-1.5 block text-sm font-medium text-slate-800">Chọn tệp PDF <span class="text-rose-600">*</span></label>
-                        <input id="file" name="file" type="file" accept="application/pdf,.pdf" required class="block min-h-11 w-full cursor-pointer rounded-lg border border-slate-300 bg-white text-sm text-slate-600 file:mr-3 file:h-11 file:border-0 file:bg-sky-100 file:px-3 file:font-semibold file:text-sky-900 hover:file:bg-sky-200">
+                        <input id="file" name="file" type="file" accept="application/pdf,.pdf" required class="block min-h-11 w-full cursor-pointer rounded-xl border border-dashed border-sky-300 bg-white text-sm text-slate-600 transition hover:border-sky-500 file:mr-3 file:h-11 file:border-0 file:bg-sky-100 file:px-3 file:font-semibold file:text-sky-900 hover:file:bg-sky-200">
                         @error('file')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
                     </div>
                     <button type="submit" class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-sky-700 px-4 text-sm font-semibold text-white transition hover:bg-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-700/20">Tải CV lên <span aria-hidden="true">↑</span></button>

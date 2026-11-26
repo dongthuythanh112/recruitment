@@ -3,6 +3,26 @@ const GLYPHS = 'ABCDEĐGHIKLMNOPQRSTUVXY0123456789';
 const FIRST_LOAD_ROWS = 8;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+document.querySelectorAll('[data-toast]').forEach((toast) => {
+    let timeout;
+
+    const dismiss = () => {
+        clearTimeout(timeout);
+        toast.classList.add('toast-out');
+        setTimeout(() => toast.remove(), reduceMotion ? 0 : 250);
+    };
+
+    const scheduleDismiss = () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(dismiss, 5000);
+    };
+
+    toast.querySelector('[data-toast-close]')?.addEventListener('click', dismiss);
+    toast.addEventListener('mouseenter', () => clearTimeout(timeout));
+    toast.addEventListener('mouseleave', scheduleDismiss);
+    scheduleDismiss();
+});
+
 function flip(element, delay = 0) {
     if (element.dataset.flipping) {
         return;
