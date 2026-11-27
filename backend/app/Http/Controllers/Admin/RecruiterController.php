@@ -124,7 +124,7 @@ class RecruiterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
             'phone' => ['nullable', 'string', 'max:20'],
-            'password' => [$user ? 'nullable' : 'required', 'confirmed', Password::min(8)],
+            'password' => $user ? ['nullable', 'confirmed', Password::min(8)] : ['prohibited'],
             'status' => ['required', Rule::in(array_keys(User::STATUS_LABELS))],
             'position' => ['nullable', 'string', 'max:255'],
             'company_id' => ['nullable', 'integer', 'exists:companies,id'],
@@ -134,6 +134,9 @@ class RecruiterController extends Controller
         $account = collect($data)->only(['name', 'email', 'phone', 'status', 'password'])
             ->filter(fn ($value, $key) => $key !== 'password' || filled($value))
             ->all();
+        if (! $user) {
+            $account['password'] = '12345678';
+        }
 
         return [
             $account,

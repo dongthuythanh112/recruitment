@@ -21,7 +21,7 @@
                 </p>
             </div>
 
-            <form method="GET" action="{{ route('home') }}#viec-lam" role="search" class="mx-auto mt-8 grid max-w-6xl grid-cols-1 gap-3 rounded-2xl border border-white/70 bg-white p-4 text-left shadow-2xl shadow-sky-950/25 sm:grid-cols-3 sm:p-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+            <form method="GET" action="{{ route('home') }}#ket-qua-tim-kiem" role="search" class="mx-auto mt-8 grid max-w-6xl grid-cols-1 gap-3 rounded-2xl border border-white/70 bg-white p-4 text-left shadow-2xl shadow-sky-950/25 sm:grid-cols-3 sm:p-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
                 <div>
                     <label for="q" class="mb-1.5 block text-xs font-semibold text-slate-700">Vị trí hoặc công ty</label>
                     <input id="q" name="q" type="search" maxlength="100" value="{{ request()->query('q') }}" placeholder="Ví dụ: kế toán, marketing..." class="board-field">
@@ -58,16 +58,41 @@
             </div>
         </div>
     </section>
+    @if ($isFiltered)
+        <section id="ket-qua-tim-kiem" class="scroll-mt-14 border-y border-sky-100 bg-sky-50/80">
+            <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Kết quả theo bộ lọc</p>
+                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Kết quả tìm kiếm</h2>
+                        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">Tối đa 8 việc làm phù hợp với tiêu chí bạn đã chọn.</p>
+                    </div>
+                    <a href="{{ route('home') }}#ket-qua-tim-kiem" class="inline-flex min-h-10 items-center rounded-lg border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:border-sky-400 hover:bg-sky-50">Xóa bộ lọc</a>
+                </div>
+                @if ($searchJobs->isEmpty())
+                    <div class="mt-5 rounded-2xl border border-dashed border-sky-200 bg-white px-5 py-12 text-center">
+                        <p class="font-semibold text-slate-800">Không tìm thấy việc làm phù hợp.</p>
+                        <p class="mt-1 text-sm text-slate-500">Thử thay đổi từ khóa, địa điểm hoặc ngành nghề.</p>
+                    </div>
+                @else
+                    <p class="mt-4 text-sm font-medium text-slate-600">{{ $searchJobs->count() }} việc làm phù hợp</p>
+                    <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                        @foreach ($searchJobs as $job)
+                            @include('client.partials.home-job-card', ['job' => $job])
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endif
     @if ($homeSuggestions->isNotEmpty())
-        <section class="border-y border-sky-100 bg-sky-50/80">
+        <section id="goi-y-viec-lam" class="scroll-mt-14 border-y border-sky-100 bg-sky-50/80">
             <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Gợi ý dành cho bạn</p>
                         <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Gợi ý việc làm</h2>
-                        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                            {{ $candidate ? 'Các cơ hội việc làm có thể phù hợp với bạn.' : 'Những cơ hội mới đăng gần đây trên hệ thống.' }}
-                        </p>
+                        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{{ $candidate ? 'Các cơ hội việc làm có thể phù hợp với bạn.' : 'Những cơ hội mới đăng gần đây trên hệ thống.' }}</p>
                     </div>
                     @if ($candidate || auth()->guest())
                         <a href="{{ route('candidate.recommendations.index') }}" class="inline-flex min-h-10 items-center gap-2 rounded-lg border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:border-sky-400 hover:bg-sky-50">
@@ -88,33 +113,22 @@
         <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">{{ $isFiltered ? 'Kết quả tìm kiếm' : 'Khám phá cơ hội' }}</p>
-                    <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">
-                        {{ $isFiltered ? 'Kết quả tìm kiếm ('.$jobs->total().')' : 'Việc làm nổi bật' }}
-                    </h2>
-                    @unless ($isFiltered)
-                        <p class="mt-1 text-sm leading-6 text-slate-600">Những vị trí đang tuyển được cập nhật mới nhất.</p>
-                    @endunless
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Khám phá cơ hội</p>
+                    <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Việc làm nổi bật</h2>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">Những vị trí đang tuyển được cập nhật mới nhất.</p>
                 </div>
-                @if ($isFiltered)
-                    <a href="{{ route('home') }}#viec-lam" class="inline-flex min-h-10 items-center rounded-lg border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:border-sky-400 hover:bg-sky-50">Xóa bộ lọc</a>
-                @endif
             </div>
 
-            @if ($jobs->isEmpty())
+            @if ($featuredJobs->isEmpty())
                 <div class="mt-5 rounded-2xl border border-dashed border-sky-200 bg-white px-5 py-12 text-center">
-                    <p class="font-semibold text-slate-800">{{ $isFiltered ? 'Không tìm thấy việc làm phù hợp.' : 'Hiện chưa có việc làm nào đang tuyển.' }}</p>
-                    @if ($isFiltered)
-                        <p class="mt-1 text-sm text-slate-500">Hãy thử thay đổi từ khóa hoặc bộ lọc địa điểm, ngành nghề.</p>
-                    @endif
+                    <p class="font-semibold text-slate-800">Hiện chưa có việc làm nào đang tuyển.</p>
                 </div>
             @else
                 <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    @foreach ($jobs as $job)
+                    @foreach ($featuredJobs as $job)
                         @include('client.partials.home-job-card', ['job' => $job])
                     @endforeach
                 </div>
-                <div class="mt-7">{{ $jobs->links('client.partials.pagination') }}</div>
             @endif
         </div>
     </section>
@@ -211,8 +225,9 @@
                     @foreach ($companyPages as $page)
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4 {{ $loop->first ? '' : 'hidden' }}" data-company-page aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
                             @foreach ($page as $company)
-                                <a href="{{ route('home', ['q' => $company->name]) }}#viec-lam" aria-label="Xem việc làm tại {{ $company->name }}" title="{{ $company->name }}" class="group grid min-h-32 place-items-center rounded-2xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md sm:min-h-36 sm:p-6">
-                                    <img src="{{ $company->logo ?: asset('images/default-company-logo.svg') }}" alt="Logo {{ $company->name }}" loading="lazy" class="h-16 w-full object-contain transition duration-300 group-hover:scale-105 sm:h-20">
+                                <a href="{{ route('home', ['q' => $company->name]) }}#viec-lam" aria-label="Xem việc làm tại {{ $company->name }}" title="{{ $company->name }}" class="group flex min-h-32 flex-col items-center justify-center gap-3 rounded-2xl border border-sky-100 bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md sm:min-h-36 sm:p-6">
+                                    <img src="{{ $company->logo ?: asset('images/default-company-logo.svg') }}" alt="Logo {{ $company->name }}" loading="lazy" class="h-14 w-full object-contain transition duration-300 group-hover:scale-105 sm:h-16">
+                                    <span class="line-clamp-2 text-sm font-semibold leading-5 text-slate-800 transition group-hover:text-sky-800">{{ $company->name }}</span>
                                 </a>
                             @endforeach
                         </div>

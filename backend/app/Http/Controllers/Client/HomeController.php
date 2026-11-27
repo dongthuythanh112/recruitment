@@ -49,7 +49,7 @@ class HomeController extends Controller
             ->take(3)
             ->values();
 
-        $jobs = Job::published()
+        $searchJobs = Job::published()
             ->with('company')
             ->when($filters['q'] ?? null, fn ($query, $keyword) => $query->where(fn ($query) => $query
                 ->where('title', 'like', "%{$keyword}%")
@@ -57,12 +57,17 @@ class HomeController extends Controller
             ->when($filters['location'] ?? null, fn ($query, $location) => $query->where('location', 'like', "%{$location}%"))
             ->when($industry, fn ($query) => $query->whereIn('industry_id', $industry->selfAndDescendantIds()))
             ->latest('published_at')
-            ->paginate(9)
-            ->withQueryString()
-            ->fragment('viec-lam');
+            ->limit(8)
+            ->get();
+        $featuredJobs = Job::published()
+            ->with('company')
+            ->latest('published_at')
+            ->limit(9)
+            ->get();
 
         return view('client.home', [
-            'jobs' => $jobs,
+            'searchJobs' => $searchJobs,
+            'featuredJobs' => $featuredJobs,
             'candidate' => $candidate,
             'savedJobIds' => $savedJobIds,
             'homeSuggestions' => $homeSuggestions,
