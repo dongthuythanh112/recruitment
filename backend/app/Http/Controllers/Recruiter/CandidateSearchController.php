@@ -20,7 +20,10 @@ class CandidateSearchController extends Controller
     public function index(Request $request, CandidateSearchability $searchability): View
     {
         $data = $request->validate([
-            'job_id' => ['nullable', 'integer', Rule::exists('jobs', 'id')->where(fn ($query) => $query->where('created_by', $request->user()->id))],
+            'job_id' => ['nullable', 'integer', Rule::exists('jobs', 'id')->where(fn ($query) => $query
+                ->where('created_by', $request->user()->id)
+                ->where('status', Job::STATUS_APPROVED)
+                ->where(fn ($query) => $query->whereNull('deadline')->orWhereDate('deadline', '>=', today())))],
             'position' => ['nullable', 'string', 'max:150'],
             'location' => ['nullable', 'string', 'max:150'],
             'experience_min' => ['nullable', 'numeric', 'min:0', 'max:80'],
@@ -29,13 +32,13 @@ class CandidateSearchController extends Controller
         ]);
 
         $jobs = $request->user()->createdJobs()
-            ->with('skills')
+            ->published()
+            ->with(['skills', 'industry'])
             ->orderBy('title')
-            ->get(['id', 'title', 'location', 'experience_years', 'salary_min', 'salary_max', 'status', 'published_at']);
+            ->get(['id', 'industry_id', 'title', 'location', 'experience_years', 'salary_min', 'salary_max', 'status', 'published_at', 'deadline']);
         $hasManualCriteria = collect($data)->except('job_id')->contains(fn ($value) => $value !== null && $value !== '');
-        $selectedJob = isset($data['job_id'])
-            ? $jobs->firstWhere('id', (int) $data['job_id'])
-            : ($hasManualCriteria ? null : $jobs->where('status', Job::STATUS_APPROVED)->sortByDesc('published_at')->first());
+        $selectedJob = isset($data['job_id']) ? $jobs->firstWhere('id', (int) $data['job_id']) : null;
+        $comparisonJobs = $selectedJob ? collect([$selectedJob]) : $jobs;
         $filters = [
             'job_id' => $selectedJob?->id ?? '',
             'position' => trim($data['position'] ?? '') ?: ($selectedJob?->title ?? ''),
@@ -44,7 +47,7 @@ class CandidateSearchController extends Controller
             'salary_min' => $data['salary_min'] ?? $selectedJob?->salary_min,
             'salary_max' => $data['salary_max'] ?? $selectedJob?->salary_max,
         ];
-        $hasCriteria = collect($filters)->except('job_id')->contains(fn ($value) => $value !== null && $value !== '');
+        $hasCriteria = $hasManualCriteria || $jobs->isNotEmpty();
 
         $profiles = CandidateProfile::query()
             ->whereIn('id', $searchability->candidateIds())
@@ -55,52 +58,75 @@ class CandidateSearchController extends Controller
             ->get();
 
         $rankedCandidates = $profiles
-            ->map(function (CandidateProfile $candidate) use ($filters, $hasCriteria, $selectedJob): ?CandidateProfile {
-                $positionMatches = ! $filters['position'] || $this->positionMatches($candidate, $filters['position']);
-                $locationMatches = ! $filters['location'] || ! filled($candidate->address) || $this->locationMatches($candidate->address, $filters['location']);
-                $experience = $candidate->years_of_experience !== null ? (float) $candidate->years_of_experience : null;
-                $experienceMatches = $filters['experience_min'] === null
-                    || $experience === null
-                    || $experience >= (float) $filters['experience_min'];
-                $salaryMatches = $this->salaryMatches($candidate, $filters['salary_min'], $filters['salary_max']);
+            ->map(function (CandidateProfile $candidate) use ($filters, $hasCriteria, $comparisonJobs): ?CandidateProfile {
+                $bestMatch = $comparisonJobs
+                    ->map(function (Job $job) use ($candidate, $filters): ?array {
+                        $jobPosition = trim($job->title.' '.$job->industry?->name);
+                        if (! $this->positionMatches($candidate, $jobPosition)) {
+                            return null;
+                        }
+                        if (filled($filters['position']) && ! $this->positionMatches($candidate, $filters['position'])) {
+                            return null;
+                        }
 
-                if (! $positionMatches || ! $locationMatches || ! $experienceMatches || ! $salaryMatches) {
+                        $locations = collect([$job->location, $filters['location']])->filter()->unique();
+                        foreach ($locations as $location) {
+                            if (filled($candidate->address) && ! $this->locationMatches($candidate->address, $location)) {
+                                return null;
+                            }
+                        }
+
+                        $candidateExperience = $candidate->years_of_experience !== null
+                            ? (float) $candidate->years_of_experience
+                            : null;
+                        $requiredExperience = collect([$job->experience_years, $filters['experience_min']])
+                            ->filter(fn ($value) => $value !== null && $value !== '')
+                            ->map(fn ($value) => (float) $value)
+                            ->max();
+                        if ($requiredExperience !== null && $candidateExperience !== null && $candidateExperience < $requiredExperience) {
+                            return null;
+                        }
+
+                        if (! $this->salaryMatches($candidate, $job->salary_min, $job->salary_max)
+                            || ! $this->salaryMatches($candidate, $filters['salary_min'], $filters['salary_max'])) {
+                            return null;
+                        }
+
+                        $reasons = ['Vị trí mong muốn phù hợp'];
+                        $score = 3;
+                        if ($locations->isNotEmpty() && filled($candidate->address)) {
+                            $reasons[] = 'Địa điểm phù hợp';
+                            $score += 2;
+                        }
+                        if ($requiredExperience !== null && $candidateExperience !== null) {
+                            $reasons[] = 'Đạt kinh nghiệm yêu cầu';
+                            $score += 2;
+                        }
+                        if (($job->salary_min !== null || $job->salary_max !== null || $filters['salary_min'] !== null || $filters['salary_max'] !== null)
+                            && ($candidate->desired_salary_min !== null || $candidate->desired_salary_max !== null)) {
+                            $reasons[] = 'Mức lương mong muốn phù hợp';
+                            $score += 2;
+                        }
+
+                        $jobSkillNames = $job->skills->map(fn ($skill) => $this->normalize($skill->name))->all();
+                        $matchedSkills = $candidate->skills->filter(fn ($skill) => in_array($this->normalize($skill->name), $jobSkillNames, true));
+                        if ($matchedSkills->isNotEmpty()) {
+                            $reasons[] = 'Khớp kỹ năng: '.$matchedSkills->take(2)->pluck('name')->implode(', ');
+                            $score += min(2, $matchedSkills->count());
+                        }
+
+                        return ['job' => $job, 'score' => $score, 'reasons' => $reasons];
+                    })
+                    ->filter()
+                    ->sortByDesc('score')
+                    ->first();
+
+                if (! $bestMatch) {
                     return null;
                 }
 
-                $reasons = [];
-                $score = 0;
-
-                if ($filters['position']) {
-                    $reasons[] = 'Vị trí mong muốn phù hợp';
-                    $score += 3;
-                }
-                if ($filters['location'] && filled($candidate->address) && $this->locationMatches($candidate->address, $filters['location'])) {
-                    $reasons[] = 'Địa điểm phù hợp';
-                    $score += 2;
-                }
-                if ($filters['experience_min'] !== null && $experience !== null && $experience >= (float) $filters['experience_min']) {
-                    $reasons[] = 'Đạt kinh nghiệm yêu cầu';
-                    $score += 2;
-                }
-                if (($filters['salary_min'] !== null || $filters['salary_max'] !== null)
-                    && ($candidate->desired_salary_min !== null || $candidate->desired_salary_max !== null)
-                    && $this->salaryMatches($candidate, $filters['salary_min'], $filters['salary_max'])) {
-                    $reasons[] = 'Mức lương mong muốn phù hợp';
-                    $score += 2;
-                }
-
-                if ($selectedJob) {
-                    $jobSkillNames = $selectedJob->skills->map(fn ($skill) => $this->normalize($skill->name))->all();
-                    $matchedSkills = $candidate->skills->filter(fn ($skill) => in_array($this->normalize($skill->name), $jobSkillNames, true));
-                    if ($matchedSkills->isNotEmpty()) {
-                        $reasons[] = 'Khớp kỹ năng: '.$matchedSkills->take(2)->pluck('name')->implode(', ');
-                        $score += min(2, $matchedSkills->count());
-                    }
-                }
-
-                $candidate->recommendation_score = $score;
-                $candidate->recommendation_reasons = $reasons;
+                $candidate->recommendation_score = $bestMatch['score'];
+                $candidate->recommendation_reasons = [...$bestMatch['reasons'], 'Phù hợp với tin: '.$bestMatch['job']->title];
                 $candidate->profile_completeness = (int) filled($candidate->desired_position)
                     + (int) filled($candidate->address)
                     + (int) ($candidate->years_of_experience !== null)
@@ -119,7 +145,6 @@ class CandidateSearchController extends Controller
                     ?: (($b->updated_at?->timestamp ?? 0) <=> ($a->updated_at?->timestamp ?? 0));
             })
             ->values();
-
         $perPage = 12;
         $page = LengthAwarePaginator::resolveCurrentPage();
         $candidates = new LengthAwarePaginator(

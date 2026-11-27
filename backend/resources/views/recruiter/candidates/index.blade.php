@@ -19,7 +19,7 @@
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900">Bộ lọc tiêu chí</h2>
-                        <p class="mt-0.5 text-xs leading-5 text-slate-500">Chọn một tin để đối chiếu. Nếu chưa chọn bộ lọc, hệ thống tự dùng tin đã duyệt mới nhất của bạn; bạn cũng có thể nhập tiêu chí riêng.</p>
+                        <p class="mt-0.5 text-xs leading-5 text-slate-500">Chỉ tin đã duyệt và còn hạn mới được dùng để gợi ý. Chọn một tin để đối chiếu riêng, hoặc để trống để so sánh với tất cả tin đủ điều kiện; bạn cũng có thể nhập thêm tiêu chí lọc.</p>
                     </div>
                     @if ($hasCriteria)
                         <a href="{{ route('recruiter.candidates.index') }}" class="text-xs font-semibold text-sky-800 hover:text-sky-950">Xóa bộ lọc</a>
@@ -71,8 +71,8 @@
                     <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-sky-100 text-sky-800">
                         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-7"><circle cx="9" cy="8" r="3.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20m2-11a3.5 3.5 0 1 0 0-7m1 10a5.5 5.5 0 0 1 3 5v1"/></svg>
                     </span>
-                    <h2 class="mt-4 font-bold text-slate-900">{{ $hasCriteria ? 'Chưa có ứng viên khớp bộ lọc' : 'Chưa có hồ sơ đang bật tìm kiếm' }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">{{ $hasCriteria ? 'Hãy thử nới lỏng tiêu chí hoặc chọn tin tuyển dụng khác.' : 'Ứng viên sẽ xuất hiện tại đây khi cho phép nhà tuyển dụng xem hồ sơ.' }}</p>
+                    <h2 class="mt-4 font-bold text-slate-900">{{ $jobs->isEmpty() ? 'Chưa có tin tuyển dụng phù hợp để đối chiếu' : ($hasCriteria ? 'Chưa có ứng viên khớp bộ lọc' : 'Chưa có hồ sơ đang bật tìm kiếm') }}</h2>
+                    <p class="mt-1 text-sm text-slate-500">{{ $jobs->isEmpty() ? 'Cần có tin đã được duyệt và còn hạn nộp hồ sơ để gợi ý ứng viên.' : ($hasCriteria ? 'Hãy thử nới lỏng tiêu chí hoặc chọn tin tuyển dụng khác.' : 'Ứng viên sẽ xuất hiện tại đây khi cho phép nhà tuyển dụng xem hồ sơ.') }}</p>
                 </div>
             @else
                 <div class="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
