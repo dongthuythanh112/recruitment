@@ -46,13 +46,13 @@
                 <a href="{{ route('recruiter.applications.index', array_filter(['job_id' => $jobId])) }}" @class([
                     'inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full px-3.5 text-sm font-medium transition',
                     'bg-flap text-ink' => $status === null,
-                    'bg-white/8 text-paper/75 hover:bg-white/15 hover:text-white' => $status !== null,
+                    'bg-white/8 text-paper/75 hover:bg-flap hover:text-ink' => $status !== null,
                 ])>Tất cả <span class="text-xs opacity-75">{{ $counts->sum() }}</span></a>
                 @foreach ($statuses as $key => $label)
                     <a href="{{ route('recruiter.applications.index', array_filter(['job_id' => $jobId, 'status' => $key])) }}" @class([
                         'inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full px-3.5 text-sm font-medium transition',
                         'bg-flap text-ink' => $status === $key,
-                        'bg-white/8 text-paper/75 hover:bg-white/15 hover:text-white' => $status !== $key,
+                        'bg-white/8 text-paper/75 hover:bg-flap hover:text-ink' => $status !== $key,
                     ])>{{ $label }} <span class="text-xs opacity-75">{{ $counts[$key] ?? 0 }}</span></a>
                 @endforeach
             </nav>
