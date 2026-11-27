@@ -10,24 +10,52 @@
         $mailto = 'mailto:'.config('app.contact_email').'?subject='.rawurlencode('Đăng tin tuyển dụng trên Ga Việc');
     @endphp
 
-    <section class="mx-auto max-w-6xl px-4 pt-10 pb-8 lg:pt-14" data-enter>
-        <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-end">
-            <h1 class="font-signage text-5xl leading-[1.08] font-extrabold tracking-wide text-balance uppercase sm:text-6xl lg:text-7xl">
-                Một tấm bảng cho <span class="text-flap">người tìm việc</span> và <span class="text-flap">nơi cần người</span>
-            </h1>
-            <div>
-                <p class="text-paper/85">
-                    Đang mở {{ number_format($openJobsCount, 0, ',', '.') }} vị trí từ {{ number_format($hiringCompaniesCount, 0, ',', '.') }} công ty.
-                    Tin nào cũng được kiểm duyệt trước khi lên bảng, hết hạn thì tự xuống.
+    <section class="relative isolate w-full overflow-hidden bg-gradient-to-br from-sky-950 via-sky-800 to-cyan-700 py-11 text-white sm:py-14 lg:py-16" data-enter>
+        <div aria-hidden="true" class="absolute -left-24 -top-28 size-80 rounded-full bg-cyan-300/15 blur-3xl"></div>
+        <div aria-hidden="true" class="absolute -bottom-40 right-[-4rem] size-[28rem] rounded-full border-[58px] border-white/5"></div>
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
+            <div class="mx-auto max-w-5xl text-center">
+                <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold tracking-wide text-cyan-50 backdrop-blur-sm sm:text-sm">
+                    <span class="size-2 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]"></span>
+                    {{ number_format($openJobsCount, 0, ',', '.') }} vị trí đang tuyển · {{ number_format($hiringCompaniesCount, 0, ',', '.') }} công ty
                 </p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <a href="#viec-lam" class="btn-flap">Xem bảng việc làm</a>
-                    <a href="#nha-tuyen-dung" class="btn-outline">Đăng tin tuyển dụng</a>
+                <h1 class="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
+                    Một tấm bảng cho <span class="text-cyan-200">người tìm việc</span><br class="hidden sm:block"> và <span class="text-cyan-200">nơi cần người</span>
+                </h1>
+                <p class="mx-auto mt-4 max-w-2xl text-sm leading-6 text-sky-100 sm:text-base">
+                    Tìm kiếm cơ hội phù hợp với bạn. Mọi vị trí đều được kiểm duyệt trước khi hiển thị.
+                </p>
+            </div>
+
+            <form method="GET" action="{{ route('home') }}#viec-lam" role="search" class="mx-auto mt-8 grid max-w-6xl grid-cols-1 gap-3 rounded-2xl border border-white/70 bg-white p-4 text-left shadow-2xl shadow-sky-950/25 sm:grid-cols-3 sm:p-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+                <div>
+                    <label for="q" class="mb-1.5 block text-xs font-semibold text-slate-700">Vị trí hoặc công ty</label>
+                    <input id="q" name="q" type="search" maxlength="100" value="{{ request()->query('q') }}" placeholder="Ví dụ: kế toán, marketing..." class="board-field">
                 </div>
+                <div>
+                    <label for="location" class="mb-1.5 block text-xs font-semibold text-slate-700">Địa điểm</label>
+                    <input id="location" name="location" type="text" maxlength="100" value="{{ request()->query('location') }}" placeholder="Tỉnh/thành phố" class="board-field">
+                </div>
+                <div>
+                    <label for="industry_id" class="mb-1.5 block text-xs font-semibold text-slate-700">Ngành nghề</label>
+                    <select id="industry_id" name="industry_id" class="board-field">
+                        <option value="">Tất cả ngành nghề</option>
+                        @foreach ($industryOptions as $id => $name)
+                            <option value="{{ $id }}" @selected((string) request()->query('industry_id') === (string) $id)>{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-sky-800 px-6 text-sm font-bold text-white transition hover:bg-sky-950 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 sm:col-span-3 lg:col-span-1">
+                    <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M8.5 3a5.5 5.5 0 1 0 3.42 9.81l3.63 3.64a.75.75 0 1 0 1.06-1.06l-3.64-3.63A5.5 5.5 0 0 0 8.5 3ZM4.5 8.5a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z" clip-rule="evenodd" /></svg>
+                    Tìm việc
+                </button>
+            </form>
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-sky-100/85">
+                <span class="inline-flex items-center gap-2"><span class="grid size-5 place-items-center rounded-full bg-white/15 text-white">✓</span> Tin được kiểm duyệt</span>
+                <a href="#nha-tuyen-dung" class="underline decoration-white/40 underline-offset-4 transition hover:text-white">Bạn đang tuyển dụng? Đăng tin tuyển dụng</a>
             </div>
         </div>
     </section>
-
     @if ($candidate)
         <section class="border-y border-sky-100 bg-sky-50/80">
             <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
@@ -115,27 +143,6 @@
                     <time class="flap" data-clock>{{ now()->format('H:i') }}</time>
                 </div>
             </div>
-
-            <form method="GET" action="{{ route('home') }}#viec-lam" role="search" class="grid gap-3 border-b border-slate-200 bg-sky-50/70 px-4 py-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
-                <div>
-                    <label for="q" class="mb-1 block text-xs text-paper/70">Vị trí hoặc công ty</label>
-                    <input id="q" name="q" type="search" maxlength="100" value="{{ request()->query('q') }}" class="board-field">
-                </div>
-                <div>
-                    <label for="location" class="mb-1 block text-xs text-paper/70">Địa điểm</label>
-                    <input id="location" name="location" type="text" maxlength="100" value="{{ request()->query('location') }}" class="board-field">
-                </div>
-                <div>
-                    <label for="industry_id" class="mb-1 block text-xs text-paper/70">Ngành nghề</label>
-                    <select id="industry_id" name="industry_id" class="board-field">
-                        <option value="">Tất cả ngành nghề</option>
-                        @foreach ($industryOptions as $id => $name)
-                            <option value="{{ $id }}" @selected((string) request()->query('industry_id') === (string) $id)>{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="btn-flap cursor-pointer">Tìm việc</button>
-            </form>
 
             @if ($jobs->isEmpty())
                 <p class="px-4 py-14 text-center text-paper/70">
