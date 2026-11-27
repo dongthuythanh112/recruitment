@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RecruiterController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\NotificationController as CandidateNotificationController;
+use App\Http\Controllers\Client\RecommendationController as CandidateRecommendationController;
 use App\Http\Controllers\Client\ApplicationController as CandidateApplicationController;
 use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
@@ -41,6 +42,7 @@ Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(functio
     Route::get('thong-bao/{notification}', [CandidateNotificationController::class, 'show'])->name('notifications.show');
     Route::patch('thong-bao/{notification}/read', [CandidateNotificationController::class, 'markRead'])->name('notifications.read');
     Route::patch('thong-bao/read-all', [CandidateNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('goi-y-viec-lam', [CandidateRecommendationController::class, 'index'])->name('recommendations.index');
     Route::get('don-ung-tuyen', [CandidateApplicationController::class, 'index'])->name('applications.index');
     Route::get('ung-tuyen/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
     Route::post('ung-tuyen/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');

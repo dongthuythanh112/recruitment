@@ -24,8 +24,8 @@
             </a>
             <nav class="flex min-w-0 items-center gap-1 text-xs font-medium whitespace-nowrap sm:gap-4 sm:text-sm" aria-label="Điều hướng chính">
                 <a href="{{ route('home') }}#viec-lam" class="board-link hidden sm:inline-flex">Bảng việc làm</a>
-                <a href="{{ route('home') }}#tuyen" class="board-link">Tuyến ngành</a>
-                <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link text-flap">Nhà tuyển dụng</a>
+                <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
+                <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                 @auth
                     @if (auth()->user()->role === \App\Models\User::ROLE_RECRUITER)
                         <a href="{{ route('recruiter.jobs.index') }}" class="board-link text-flap">Quản lý tin</a>
@@ -43,8 +43,9 @@
                             : 0;
                     @endphp
                     @if ($account->role === \App\Models\User::ROLE_CANDIDATE)
+                        <a href="{{ route('candidate.recommendations.index') }}" @if (request()->routeIs('candidate.recommendations.*')) aria-current="page" @endif class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950 {{ request()->routeIs('candidate.recommendations.*') ? 'bg-sky-50 !text-sky-950' : '' }}">Gợi ý việc làm</a>
                         <details class="group/notifications relative shrink-0">
-                            <summary aria-label="Thông báo{{ $unreadCandidateNotifications ? ', '.$unreadCandidateNotifications.' chưa đọc' : '' }}" title="Thông báo" class="relative grid size-11 cursor-pointer list-none place-items-center rounded-xl text-sky-800 transition hover:bg-sky-50 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 [&::-webkit-details-marker]:hidden">
+                            <summary aria-label="Thông báo{{ $unreadCandidateNotifications ? ', '.$unreadCandidateNotifications.' chưa đọc' : '' }}" title="Thông báo" class="relative grid size-11 cursor-pointer list-none place-items-center rounded-xl text-sky-800 transition hover:bg-sky-50 hover:text-sky-950 group-open/notifications:bg-sky-50 group-open/notifications:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 [&::-webkit-details-marker]:hidden">
                                 <span class="relative grid size-5 place-items-center transition group-open/notifications:scale-105">
                                     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="size-5"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>
                                     <span class="absolute -right-1 -top-3 z-10 min-w-3 text-center text-[10px] font-black leading-none text-red-600 drop-shadow-[0_1px_1px_rgba(255,255,255,0.95)]" style="color:#dc2626">{{ $unreadCandidateNotifications > 9 ? '9+' : $unreadCandidateNotifications }}</span>
