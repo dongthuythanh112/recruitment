@@ -10,7 +10,6 @@
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Dành riêng cho bạn</p>
                     <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Gợi ý việc làm</h1>
-                    <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Danh sách được chọn theo vị trí mong muốn, địa chỉ, mức lương, kinh nghiệm và kỹ năng hiện có trong hồ sơ.</p>
                 </div>
                 <a href="{{ route('candidate.profile.edit') }}" class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:bg-sky-50">
                     Cập nhật hồ sơ
@@ -46,11 +45,6 @@
                                     @if ($job->experience_years !== null)
                                         <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ number_format((float) $job->experience_years, 1, ',', '') }}+ năm kinh nghiệm</span>
                                     @endif
-                                </div>
-                                <div class="mt-3 flex flex-wrap gap-1.5">
-                                    @foreach ($suggestion['reasons'] as $reason)
-                                        <span class="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[10px] font-medium text-sky-800">{{ $reason }}</span>
-                                    @endforeach
                                 </div>
                                 <a href="{{ route('jobs.show', $job->slug) }}" class="mt-auto inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-sky-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-sky-900">
                                     Xem tin tuyển dụng
