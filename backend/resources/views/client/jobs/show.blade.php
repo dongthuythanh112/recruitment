@@ -245,9 +245,34 @@
                         </div>
                         <a href="{{ route('home', ['industry_id' => $job->industry_id]) }}#viec-lam" class="hidden text-sm font-semibold text-sky-800 underline underline-offset-4 hover:text-sky-950 sm:inline">Xem tất cả</a>
                     </div>
-                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        @foreach ($relatedJobs as $job)
-                            @include('client.partials.job-row')
+                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                        @foreach ($relatedJobs as $relatedJob)
+                            <a href="{{ route('jobs.show', $relatedJob->slug) }}" class="group flex min-h-52 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-sky-300 hover:shadow-lg hover:shadow-sky-900/[0.06] sm:p-5">
+                                <div class="flex items-start gap-3">
+                                    <span class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+                                        @if ($relatedJob->company->logo)
+                                            <img src="{{ $relatedJob->company->logo }}" alt="Logo {{ $relatedJob->company->name }}" loading="lazy" class="size-full object-contain p-1.5">
+                                        @else
+                                            <img src="{{ asset('images/default-company-logo.svg') }}" alt="Logo mặc định {{ $relatedJob->company->name }}" loading="lazy" class="size-full object-contain p-1.5">
+                                        @endif
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="line-clamp-2 block min-h-10 text-sm font-bold leading-5 text-slate-900 transition group-hover:text-sky-800">{{ $relatedJob->title }}</span>
+                                        <span class="mt-1 block truncate text-xs font-medium text-slate-500">{{ $relatedJob->company->name }}</span>
+                                    </span>
+                                </div>
+                                <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700">
+                                    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" class="size-4"><rect x="2.25" y="4.25" width="15.5" height="11.5" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 8.1c.35-.4.9-.6 1.65-.6 1.05 0 1.75.48 1.75 1.2 0 1.8-3.5.85-3.5 2.75 0 .75.7 1.3 1.85 1.3.75 0 1.4-.22 1.8-.65M7.75 6.5v7m4.25-5.75h2.5M12 10h2.5m-2.5 2.25h2.5"/></svg>
+                                    {{ $relatedJob->salaryShort() }}
+                                </span>
+                                <span class="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-500">
+                                    <span class="inline-flex min-w-0 items-center gap-1.5">
+                                        <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4 shrink-0 text-sky-700"><path fill-rule="evenodd" d="M10 1.75a6.25 6.25 0 0 0-6.25 6.25c0 4.35 5.47 9.56 5.7 9.78a.8.8 0 0 0 1.1 0c.23-.22 5.7-5.43 5.7-9.78A6.25 6.25 0 0 0 10 1.75Zm0 8.5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd"/></svg>
+                                        <span class="truncate">{{ $relatedJob->location ?: 'Linh hoạt địa điểm' }}</span>
+                                    </span>
+                                    <span aria-hidden="true" class="shrink-0 font-bold text-sky-700 transition group-hover:translate-x-0.5">→</span>
+                                </span>
+                            </a>
                         @endforeach
                     </div>
                 </section>

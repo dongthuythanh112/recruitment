@@ -33,7 +33,6 @@
                         <a href="{{ route('recruiter.company.edit') }}" @if (request()->routeIs('recruiter.company.*')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('recruiter.company.*')])>Công ty</a>
                     @else
                         <a href="{{ route('home') }}#viec-lam" class="board-link hidden rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950 sm:inline-flex">Bảng việc làm</a>
-                        <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
                         <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                     @endif
                     @php
@@ -140,7 +139,6 @@
                     </details>
                 @else
                     <a href="{{ route('home') }}#viec-lam" class="board-link hidden rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950 sm:inline-flex">Bảng việc làm</a>
-                    <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
                     <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                     <a href="{{ route('login') }}" class="board-link">Đăng nhập</a>
                     <a href="{{ route('register') }}" class="inline-flex min-h-9 items-center rounded bg-flap px-3 font-semibold text-ink transition hover:bg-white">Đăng ký</a>

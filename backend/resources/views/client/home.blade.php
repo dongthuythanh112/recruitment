@@ -135,7 +135,7 @@
 
     @if ($industries->isNotEmpty())
         @php($industryPages = $industries->chunk(8))
-        <section id="top-nganh-nghe" class="bg-white">
+        <section id="top-nganh-nghe" class="border-y border-sky-100 bg-sky-50/80">
             <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
