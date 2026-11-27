@@ -24,6 +24,7 @@ use App\Http\Controllers\Recruiter\NotificationController as RecruiterNotificati
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
 use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
 use App\Http\Controllers\Recruiter\JobController as RecruiterJobController;
+use App\Http\Controllers\Recruiter\StatisticController as RecruiterStatisticController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -71,6 +72,7 @@ Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(functio
 });
 
 Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recruiter'])->group(function () {
+    Route::get('thong-ke', [RecruiterStatisticController::class, 'index'])->name('statistics.index');
     Route::get('thong-bao', [RecruiterNotificationController::class, 'index'])->name('notifications.index');
     Route::get('thong-bao/{notification}/open', [RecruiterNotificationController::class, 'open'])->name('notifications.open');
     Route::patch('thong-bao/{notification}/read', [RecruiterNotificationController::class, 'markRead'])->name('notifications.read');
