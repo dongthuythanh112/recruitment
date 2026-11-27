@@ -15,6 +15,14 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    private const PROVINCES = [
+        'An Giang', 'Bắc Ninh', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Điện Biên',
+        'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Nội', 'Hà Tĩnh', 'Hải Phòng',
+        'Hồ Chí Minh', 'Huế', 'Hưng Yên', 'Khánh Hòa', 'Lai Châu', 'Lâm Đồng',
+        'Lạng Sơn', 'Lào Cai', 'Nghệ An', 'Ninh Bình', 'Phú Thọ', 'Quảng Ngãi',
+        'Quảng Ninh', 'Quảng Trị', 'Sơn La', 'Tây Ninh', 'Thái Nguyên', 'Thanh Hóa',
+        'Tuyên Quang', 'Vĩnh Long', 'Cần Thơ', 'Đà Nẵng',
+    ];
     public function index(Request $request, JobRecommendationService $recommendations): View
     {
         // Trang công khai: tham số dạng mảng (?q[]=x) không được lọt xuống câu truy vấn.
@@ -54,6 +62,7 @@ class HomeController extends Controller
             'hiringCompaniesCount' => Job::published()->distinct()->count('company_id'),
             'candidatesCount' => CandidateProfile::count(),
             'industryOptions' => Industry::where('status', Industry::STATUS_ACTIVE)->orderBy('name')->pluck('name', 'id'),
+            'provinceOptions' => self::PROVINCES,
             'industries' => $this->topIndustries(),
             'companies' => Company::whereHas('jobs', fn ($query) => $query->published())
                 ->withCount(['jobs as open_jobs_count' => fn ($query) => $query->published()])

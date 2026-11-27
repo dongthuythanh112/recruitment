@@ -10,15 +10,11 @@
         $mailto = 'mailto:'.config('app.contact_email').'?subject='.rawurlencode('Đăng tin tuyển dụng trên Ga Việc');
     @endphp
 
-    <section class="relative isolate w-full overflow-hidden bg-gradient-to-br from-sky-950 via-sky-800 to-cyan-700 py-11 text-white sm:py-14 lg:py-16" data-enter>
+    <section class="relative z-20 isolate w-full overflow-x-clip bg-gradient-to-br from-sky-950 via-sky-800 to-cyan-700 py-11 text-white sm:py-14 lg:py-16" data-enter>
         <div aria-hidden="true" class="absolute -left-24 -top-28 size-80 rounded-full bg-cyan-300/15 blur-3xl"></div>
         <div aria-hidden="true" class="absolute -bottom-40 right-[-4rem] size-[28rem] rounded-full border-[58px] border-white/5"></div>
         <div class="relative mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
             <div class="mx-auto max-w-5xl text-center">
-                <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold tracking-wide text-cyan-50 backdrop-blur-sm sm:text-sm">
-                    <span class="size-2 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]"></span>
-                    {{ number_format($openJobsCount, 0, ',', '.') }} vị trí đang tuyển · {{ number_format($hiringCompaniesCount, 0, ',', '.') }} công ty
-                </p>
                 <h1 class="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
                     Một tấm bảng cho <span class="text-cyan-200">người tìm việc</span><br class="hidden sm:block"> và <span class="text-cyan-200">nơi cần người</span>
                 </h1>
@@ -34,7 +30,15 @@
                 </div>
                 <div>
                     <label for="location" class="mb-1.5 block text-xs font-semibold text-slate-700">Địa điểm</label>
-                    <input id="location" name="location" type="text" maxlength="100" value="{{ request()->query('location') }}" placeholder="Tỉnh/thành phố" class="board-field">
+                    <div class="relative">
+                        <select id="location" name="location" class="min-h-11 w-full appearance-none rounded-lg border border-slate-300 bg-white px-3.5 pr-10 text-sm text-slate-800 shadow-sm transition hover:border-sky-400 focus:border-sky-600 focus:outline-none focus:ring-4 focus:ring-sky-100">
+                            <option value="" @selected(!request()->query('location'))>Tất cả tỉnh/thành</option>
+                            @foreach ($provinceOptions as $province)
+                                <option value="{{ $province }}" @selected(request()->query('location') === $province)>{{ $province }}</option>
+                            @endforeach
+                        </select>
+                        <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-sky-700"><path fill-rule="evenodd" d="M5.22 7.22a.75.75 0 0 1 1.06 0L10 10.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </div>
                 </div>
                 <div>
                     <label for="industry_id" class="mb-1.5 block text-xs font-semibold text-slate-700">Ngành nghề</label>
