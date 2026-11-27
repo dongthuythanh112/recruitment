@@ -16,13 +16,18 @@ class ApplicationController extends Controller
     public function index(Request $request): View
     {
         $candidate = $this->candidate($request);
-        $applications = $candidate->applications()
+        $applicationsQuery = $candidate->applications()
             ->with([
                 'job.company',
                 'resume',
                 'statusHistories' => fn ($query) => $query->with('changer')->orderBy('created_at'),
-            ])
-            ->latest('applied_at')
+            ]);
+
+        if ($request->filled('application_id') && ctype_digit((string) $request->query('application_id'))) {
+            $applicationsQuery->whereKey((int) $request->query('application_id'));
+        }
+
+        $applications = $applicationsQuery->latest('applied_at')
             ->paginate(10);
 
         return view('client.applications.index', compact('applications'));

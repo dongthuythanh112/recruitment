@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RecruiterController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\NotificationController as CandidateNotificationController;
 use App\Http\Controllers\Client\ApplicationController as CandidateApplicationController;
 use App\Http\Controllers\Client\AuthController as ClientAuthController;
 use App\Http\Controllers\Client\JobController as ClientJobController;
@@ -35,6 +36,11 @@ Route::middleware('guest')->group(function () {
 Route::post('dang-xuat', [RegisteredAccountController::class, 'destroy'])->middleware('auth')->name('logout');
 
 Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(function () {
+    Route::get('thong-bao', [CandidateNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('thong-bao/{notification}/open', [CandidateNotificationController::class, 'open'])->name('notifications.open');
+    Route::get('thong-bao/{notification}', [CandidateNotificationController::class, 'show'])->name('notifications.show');
+    Route::patch('thong-bao/{notification}/read', [CandidateNotificationController::class, 'markRead'])->name('notifications.read');
+    Route::patch('thong-bao/read-all', [CandidateNotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::get('don-ung-tuyen', [CandidateApplicationController::class, 'index'])->name('applications.index');
     Route::get('ung-tuyen/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
     Route::post('ung-tuyen/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');

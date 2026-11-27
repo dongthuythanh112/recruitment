@@ -43,7 +43,7 @@
                         $jobIsOpen = $job->status === \App\Models\Job::STATUS_APPROVED
                             && (! $job->deadline || $job->deadline->isToday() || $job->deadline->isFuture());
                     @endphp
-                    <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+                    <article id="application-{{ $application->id }}" class="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
                         <div class="flex flex-wrap items-start justify-between gap-4 p-5 sm:p-6">
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2">

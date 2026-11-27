@@ -35,7 +35,71 @@
                     @php
                         $account = auth()->user();
                         $avatar = $account->role === \App\Models\User::ROLE_CANDIDATE ? $account->candidateProfile?->avatar : null;
+                        $candidateNotifications = $account->role === \App\Models\User::ROLE_CANDIDATE
+                            ? $account->userNotifications()->where('created_at', '>=', now()->subMonths(3))->latest('created_at')->get()
+                            : collect();
+                        $unreadCandidateNotifications = $account->role === \App\Models\User::ROLE_CANDIDATE
+                            ? $account->userNotifications()->where('created_at', '>=', now()->subMonths(3))->whereNull('read_at')->count()
+                            : 0;
                     @endphp
+                    @if ($account->role === \App\Models\User::ROLE_CANDIDATE)
+                        <details class="group/notifications relative shrink-0">
+                            <summary aria-label="Thông báo{{ $unreadCandidateNotifications ? ', '.$unreadCandidateNotifications.' chưa đọc' : '' }}" title="Thông báo" class="relative grid size-11 cursor-pointer list-none place-items-center rounded-xl text-sky-800 transition hover:bg-sky-50 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 [&::-webkit-details-marker]:hidden">
+                                <span class="relative grid size-5 place-items-center transition group-open/notifications:scale-105">
+                                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="size-5"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>
+                                    <span class="absolute -right-1 -top-3 z-10 min-w-3 text-center text-[10px] font-black leading-none text-red-600 drop-shadow-[0_1px_1px_rgba(255,255,255,0.95)]" style="color:#dc2626">{{ $unreadCandidateNotifications > 9 ? '9+' : $unreadCandidateNotifications }}</span>
+                                </span>
+                            </summary>
+                            <div class="absolute right-0 top-full z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white text-left text-slate-900 shadow-xl shadow-slate-900/15">
+                                <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
+                                    <div>
+                                        <h2 class="text-sm font-bold">Thông báo</h2>
+                                        <p class="mt-0.5 text-xs text-slate-500">3 tháng gần nhất · {{ $unreadCandidateNotifications }} chưa đọc</p>
+                                    </div>
+                                    @if ($unreadCandidateNotifications > 0)
+                                        <form method="POST" action="{{ route('candidate.notifications.read-all') }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button class="whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-bold text-sky-800 hover:bg-sky-50">Đánh dấu đã xem</button>
+                                        </form>
+                                    @endif
+                                </div>
+                                <div class="max-h-[min(65vh,28rem)] overflow-y-auto overscroll-contain">
+                                    @forelse ($candidateNotifications as $notification)
+                                        <div class="flex gap-3 border-b border-slate-100 px-3 py-3 last:border-0 {{ $notification->read_at ? '' : 'bg-sky-50/80' }}">
+                                            <span class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full {{ $notification->read_at ? 'bg-slate-100 text-slate-500' : 'bg-sky-100 text-sky-800' }}">
+                                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
+                                            </span>
+                                            <div class="min-w-0 flex-1">
+                                                <a href="{{ route('candidate.notifications.open', $notification) }}" class="block rounded-md focus-visible:outline-2 focus-visible:outline-sky-600">
+                                                    <span class="flex items-start gap-2 text-xs font-bold leading-5 text-slate-900">
+                                                        <span class="min-w-0 flex-1">{{ $notification->title }}</span>
+                                                        @unless ($notification->read_at)<span class="mt-1 size-2 shrink-0 rounded-full bg-sky-600" aria-label="Chưa đọc"></span>@endunless
+                                                    </span>
+                                                    <span class="mt-0.5 line-clamp-2 block text-xs leading-5 text-slate-600">{{ $notification->content }}</span>
+                                                    <span class="mt-1 block text-[10px] text-slate-400">{{ $notification->created_at?->format('H:i · d/m/Y') }}</span>
+                                                </a>
+                                                @unless ($notification->read_at)
+                                                    <form method="POST" action="{{ route('candidate.notifications.read', $notification) }}" class="mt-1">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button class="text-[10px] font-semibold text-sky-800 hover:underline">Đánh dấu đã xem</button>
+                                                    </form>
+                                                @endunless
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="px-4 py-8 text-center">
+                                            <span class="mx-auto grid size-10 place-items-center rounded-full bg-sky-50 text-sky-700">
+                                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
+                                            </span>
+                                            <p class="mt-2 text-xs font-semibold text-slate-700">Chưa có thông báo trong 3 tháng gần đây</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </details>
+                    @endif
                     <details class="group relative ml-1 shrink-0 border-l border-white/15 pl-2 sm:ml-2 sm:pl-4">
                         <summary class="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded px-1 py-1 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-flap [&::-webkit-details-marker]:hidden">
                             @if ($avatar)
@@ -52,7 +116,7 @@
                             @elseif ($account->role === \App\Models\User::ROLE_CANDIDATE)
                                 <a href="{{ route('candidate.profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Hồ sơ cá nhân</a>
                                 <a href="{{ route('candidate.resumes.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Quản lý CV</a>
-                                <a href="{{ route('candidate.applications.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Đơn ứng tuyển</a>
+                                <a href="{{ route('candidate.applications.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Việc đã ứng tuyển</a>
                                 <a href="{{ route('candidate.saved-jobs.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-sky-50">Việc làm đã lưu</a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">

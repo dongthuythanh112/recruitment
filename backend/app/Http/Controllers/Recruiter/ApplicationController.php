@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Recruiter;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\Notification;
 use App\Models\Resume;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -108,6 +109,19 @@ class ApplicationController extends Controller
                 'new_status' => $data['status'],
                 'changed_by' => $request->user()->id,
                 'note' => $data['note'] ?? null,
+            ]);
+
+            $candidateUserId = $current->candidate()->value('user_id');
+            $jobTitle = $current->job()->value('title');
+            Notification::create([
+                'user_id' => $candidateUserId,
+                'type' => 'application.status_changed',
+                'title' => 'Đơn ứng tuyển được cập nhật',
+                'content' => 'Trạng thái hồ sơ cho vị trí "'.$jobTitle.'" đã chuyển thành: '.(Application::STATUS_LABELS[$data['status']] ?? $data['status']).'.',
+                'data' => [
+                    'application_id' => $current->id,
+                    'job_id' => $current->job_id,
+                ],
             ]);
 
             return 'changed';
