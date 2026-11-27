@@ -59,9 +59,9 @@
                     <span class="whitespace-nowrap">{{ $item['label'] }}</span>
                     @if ($item['icon'] === 'bell')
                         <span @class([
-                            'ml-auto min-w-5 rounded-full px-2 py-0.5 text-center text-[10px] font-extrabold tabular-nums shadow-sm',
+                            'ml-auto min-w-5 rounded-full px-2 py-0.5 text-center text-[10px] font-extrabold tabular-nums !text-white shadow-sm',
                             'bg-sky-900 text-white ring-2 ring-sky-100' => $unreadNotificationsCount > 0,
-                            'bg-slate-200 text-slate-800' => $unreadNotificationsCount === 0,
+                            'bg-slate-600' => $unreadNotificationsCount === 0,
                         ]) aria-label="{{ $unreadNotificationsCount }} thông báo chưa đọc">{{ $unreadNotificationsCount > 99 ? '99+' : $unreadNotificationsCount }}</span>
                     @endif
                     @if ($isActive)
