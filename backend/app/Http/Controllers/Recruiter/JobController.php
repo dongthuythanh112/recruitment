@@ -70,7 +70,7 @@ class JobController extends Controller
             return $job;
         });
 
-        return redirect()->route('recruiter.jobs.edit', $job)->with('success', 'Đã lưu tin ở trạng thái nháp. Kiểm tra lại nội dung rồi gửi duyệt.');
+        return redirect()->route('recruiter.jobs.index')->with('success', 'Đã tạo tin tuyển dụng ở trạng thái nháp. Bạn có thể gửi tin để quản trị viên duyệt.');
     }
 
     public function edit(Request $request, Job $job): View
