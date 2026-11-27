@@ -1,6 +1,6 @@
 @php($selectedSkills = array_map('intval', old('skills', $job->exists ? $job->skills->pluck('id')->all() : [])))
 <div class="space-y-6">
-    <section class="rounded-lg border border-stone-200 bg-white p-5">
+    <section class="rounded-lg border border-slate-200 bg-white p-5">
         <h2 class="mb-4 text-sm font-semibold">Thông tin chung</h2>
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2"><x-admin.input name="title" label="Tiêu đề" :value="$job->title" required /></div>
@@ -18,23 +18,23 @@
         </div>
     </section>
 
-    <section class="space-y-4 rounded-lg border border-stone-200 bg-white p-5">
+    <section class="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
         <h2 class="text-sm font-semibold">Nội dung</h2>
         <x-admin.textarea name="description" label="Mô tả công việc" :value="$job->description" rows="6" required />
         <x-admin.textarea name="requirements" label="Yêu cầu" :value="$job->requirements" />
         <x-admin.textarea name="benefits" label="Quyền lợi" :value="$job->benefits" />
     </section>
 
-    <fieldset class="rounded-lg border border-stone-200 bg-white p-5">
+    <fieldset class="rounded-lg border border-slate-200 bg-white p-5">
         <legend class="px-1 text-sm font-semibold">Kỹ năng yêu cầu</legend>
         <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
             @forelse ($skills as $skillId => $skillName)
                 <label class="flex items-center gap-2">
-                    <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="accent-teal-700" @checked(in_array($skillId, $selectedSkills, true))>
+                    <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="accent-sky-700" @checked(in_array($skillId, $selectedSkills, true))>
                     {{ $skillName }}
                 </label>
             @empty
-                <p class="text-stone-500">Chưa có kỹ năng trong danh mục.</p>
+                <p class="text-slate-500">Chưa có kỹ năng trong danh mục.</p>
             @endforelse
         </div>
         @error('skills')

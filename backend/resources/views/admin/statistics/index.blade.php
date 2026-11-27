@@ -7,8 +7,8 @@
         @foreach ($cards as $card)
             @php($tag = $card['url'] ? 'a' : 'div')
             <{{ $tag }} @if ($card['url']) href="{{ $card['url'] }}" @endif
-                class="rounded-lg border border-stone-200 bg-white p-4 {{ $card['url'] ? 'hover:border-teal-700' : '' }}">
-                <p class="text-sm text-stone-500">{{ $card['label'] }}</p>
+                class="rounded-lg border border-slate-200 bg-white p-4 {{ $card['url'] ? 'hover:border-sky-700' : '' }}">
+                <p class="text-sm text-slate-500">{{ $card['label'] }}</p>
                 <p class="mt-1 text-3xl font-semibold tracking-tight tabular-nums">{{ number_format($card['value'], 0, ',', '.') }}</p>
             </{{ $tag }}>
         @endforeach

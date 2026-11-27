@@ -14,7 +14,7 @@
 @section('content')
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="space-y-4 lg:col-span-2">
-            <section class="rounded-lg border border-stone-200 bg-white p-5">
+            <section class="rounded-lg border border-slate-200 bg-white p-5">
                 <h2 class="mb-2 text-sm font-semibold">Mô tả công việc</h2>
                 <p class="text-sm whitespace-pre-line">{{ $job->description }}</p>
                 @if ($job->requirements)
@@ -29,34 +29,34 @@
                     <h2 class="mt-5 mb-2 text-sm font-semibold">Kỹ năng yêu cầu</h2>
                     <div class="flex flex-wrap gap-2 text-sm">
                         @foreach ($job->skills as $skill)
-                            <span class="rounded-full bg-stone-100 px-3 py-1">{{ $skill->name }}</span>
+                            <span class="rounded-full bg-slate-100 px-3 py-1">{{ $skill->name }}</span>
                         @endforeach
                     </div>
                 @endif
             </section>
 
-            <section class="rounded-lg border border-stone-200 bg-white p-5">
+            <section class="rounded-lg border border-slate-200 bg-white p-5">
                 <h2 class="mb-3 text-sm font-semibold">Lịch sử kiểm duyệt</h2>
-                <ul class="divide-y divide-stone-100 text-sm">
+                <ul class="divide-y divide-slate-100 text-sm">
                     @forelse ($job->moderationHistories as $history)
                         <li class="py-2">
                             <p>
                                 <span class="font-medium">{{ \App\Models\JobModerationHistory::ACTION_LABELS[$history->action] ?? $history->action }}</span>
-                                <span class="text-stone-500">· {{ $history->admin->name }} · {{ $history->created_at?->format('d/m/Y H:i') }}</span>
+                                <span class="text-slate-500">· {{ $history->admin->name }} · {{ $history->created_at?->format('d/m/Y H:i') }}</span>
                             </p>
                             @if ($history->note)
-                                <p class="mt-1 whitespace-pre-line text-stone-700">{{ $history->note }}</p>
+                                <p class="mt-1 whitespace-pre-line text-slate-700">{{ $history->note }}</p>
                             @endif
                         </li>
                     @empty
-                        <li class="text-stone-500">Chưa có thao tác kiểm duyệt nào.</li>
+                        <li class="text-slate-500">Chưa có thao tác kiểm duyệt nào.</li>
                     @endforelse
                 </ul>
             </section>
         </div>
 
         <div class="space-y-4">
-            <section class="rounded-lg border border-stone-200 bg-white p-5">
+            <section class="rounded-lg border border-slate-200 bg-white p-5">
                 <div class="mb-4 flex items-center justify-between gap-2">
                     <h2 class="text-sm font-semibold">Kiểm duyệt</h2>
                     <x-admin.badge :status="$job->status" :label="\App\Models\Job::STATUS_LABELS[$job->status] ?? $job->status" />
@@ -72,7 +72,7 @@
                         <input type="hidden" name="action" value="approve">
                         <x-admin.button class="w-full">Duyệt tin</x-admin.button>
                     </form>
-                    <form method="POST" action="{{ route('admin.jobs.moderate', $job) }}" class="space-y-2 border-t border-stone-100 pt-4">
+                    <form method="POST" action="{{ route('admin.jobs.moderate', $job) }}" class="space-y-2 border-t border-slate-100 pt-4">
                         @csrf
                         <input type="hidden" name="action" value="reject">
                         <x-admin.textarea name="note" label="Lý do từ chối" rows="3" required />
@@ -92,11 +92,11 @@
                         <x-admin.button variant="secondary" class="w-full">Khôi phục tin</x-admin.button>
                     </form>
                 @else
-                    <p class="text-sm text-stone-500">Trạng thái này không có thao tác kiểm duyệt.</p>
+                    <p class="text-sm text-slate-500">Trạng thái này không có thao tác kiểm duyệt.</p>
                 @endif
             </section>
 
-            <section class="rounded-lg border border-stone-200 bg-white p-5">
+            <section class="rounded-lg border border-slate-200 bg-white p-5">
                 <h2 class="mb-4 text-sm font-semibold">Thông tin tin đăng</h2>
                 <dl class="space-y-3 text-sm">
                     @foreach ([
@@ -115,7 +115,7 @@
                         'Người duyệt' => $job->reviewer?->name,
                     ] as $label => $value)
                         <div>
-                            <dt class="text-stone-500">{{ $label }}</dt>
+                            <dt class="text-slate-500">{{ $label }}</dt>
                             <dd class="break-words">{{ $value ?? '—' }}</dd>
                         </div>
                     @endforeach

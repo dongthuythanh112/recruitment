@@ -2,9 +2,9 @@
 
 @php
     $tone = match ($variant) {
-        'primary' => 'bg-teal-700 text-white hover:bg-teal-800',
+        'primary' => 'bg-sky-800 text-white hover:bg-sky-900',
         'danger' => 'bg-white text-red-700 ring-1 ring-inset ring-red-300 hover:bg-red-50',
-        default => 'bg-white text-stone-700 ring-1 ring-inset ring-stone-300 hover:bg-stone-50',
+        default => 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50',
     };
     $classes = "inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap cursor-pointer {$tone}";
 @endphp
