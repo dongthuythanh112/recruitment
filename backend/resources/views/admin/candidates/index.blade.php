@@ -36,11 +36,12 @@
         <div class="relative overflow-x-auto">
             <table class="min-w-full text-left text-sm">
                 <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase">
-                    <tr><th class="px-4 py-3.5 sm:px-5">Ứng viên</th><th class="px-4 py-3.5">Vị trí mong muốn</th><th class="px-4 py-3.5">Kinh nghiệm</th><th class="px-4 py-3.5 text-center">Đơn ứng tuyển</th><th class="px-4 py-3.5">Trạng thái</th><th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr>
+                    <tr><th class="w-16 px-4 py-3.5 text-center sm:px-5">STT</th><th class="px-4 py-3.5 sm:px-5">Ứng viên</th><th class="px-4 py-3.5">Vị trí mong muốn</th><th class="px-4 py-3.5">Kinh nghiệm</th><th class="px-4 py-3.5 text-center">Đơn ứng tuyển</th><th class="px-4 py-3.5">Trạng thái</th><th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($candidates as $candidate)
                         <tr class="group transition-colors hover:bg-sky-50/50">
+                            <td class="px-4 py-3.5 text-center text-xs font-bold tabular-nums text-slate-500 sm:px-5">{{ $candidates->firstItem() + $loop->index }}</td>
                             <td class="whitespace-nowrap px-4 py-3.5 sm:px-5">
                                 <div class="flex items-center gap-3">
                                     @if ($candidate->avatar)
@@ -58,7 +59,7 @@
                             <td class="px-4 py-3.5"><div class="flex justify-end"><a href="{{ route('admin.candidates.edit', $candidate) }}" aria-label="Sửa {{ $candidate->user->name }}" title="Sửa ứng viên" class="grid size-9 place-items-center rounded-lg text-slate-500 transition hover:bg-sky-100 hover:text-sky-800 focus:outline-none focus:ring-2 focus:ring-sky-500"><svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="m13.59 3.41 3 3a1.5 1.5 0 0 1 0 2.12l-8.3 8.3-4.3.95.95-4.3 8.3-8.3a1.5 1.5 0 0 1 2.12 0Z"/></svg></a></div></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy ứng viên</p><p class="mt-1 text-sm text-slate-500">Thử đổi từ khóa hoặc trạng thái tài khoản.</p></td></tr>
+                        <tr><td colspan="7" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy ứng viên</p><p class="mt-1 text-sm text-slate-500">Thử đổi từ khóa hoặc trạng thái tài khoản.</p></td></tr>
                     @endforelse
                 </tbody>
             </table>

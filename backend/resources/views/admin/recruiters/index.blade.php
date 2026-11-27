@@ -36,10 +36,11 @@
         </div>
         <div class="relative overflow-x-auto">
             <table class="min-w-full text-left text-sm">
-                <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase"><tr><th class="px-4 py-3.5 sm:px-5">Nhà tuyển dụng</th><th class="px-4 py-3.5">Công ty</th><th class="px-4 py-3.5">Chức vụ</th><th class="px-4 py-3.5 text-center">Tin đã đăng</th><th class="px-4 py-3.5">Trạng thái</th><th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr></thead>
+                <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase"><tr><th class="w-16 px-4 py-3.5 text-center sm:px-5">STT</th><th class="px-4 py-3.5 sm:px-5">Nhà tuyển dụng</th><th class="px-4 py-3.5">Công ty</th><th class="px-4 py-3.5">Chức vụ</th><th class="px-4 py-3.5 text-center">Tin đã đăng</th><th class="px-4 py-3.5">Trạng thái</th><th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr></thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($recruiters as $recruiter)
                         <tr class="group transition-colors hover:bg-sky-50/50">
+                            <td class="px-4 py-3.5 text-center text-xs font-bold tabular-nums text-slate-500 sm:px-5">{{ $recruiters->firstItem() + $loop->index }}</td>
                             <td class="whitespace-nowrap px-4 py-3.5 sm:px-5"><div class="flex items-center gap-3">
                                 @if ($recruiter->company?->logo)<img src="{{ $recruiter->company->logo }}" alt="" class="size-10 shrink-0 rounded-xl border border-slate-100 bg-white object-contain p-1">
                                 @else<span class="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 text-sm font-extrabold text-sky-800 ring-1 ring-inset ring-sky-100">{{ mb_strtoupper(mb_substr($recruiter->user->name, 0, 1)) }}</span>@endif
@@ -52,7 +53,7 @@
                             <td class="px-4 py-3.5"><div class="flex justify-end"><a href="{{ route('admin.recruiters.edit', $recruiter) }}" aria-label="Sửa {{ $recruiter->user->name }}" title="Sửa nhà tuyển dụng" class="grid size-9 place-items-center rounded-lg text-slate-500 transition hover:bg-sky-100 hover:text-sky-800 focus:outline-none focus:ring-2 focus:ring-sky-500"><svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path d="m13.59 3.41 3 3a1.5 1.5 0 0 1 0 2.12l-8.3 8.3-4.3.95.95-4.3 8.3-8.3a1.5 1.5 0 0 1 2.12 0Z"/></svg></a></div></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy nhà tuyển dụng</p><p class="mt-1 text-sm text-slate-500">Thử đổi từ khóa, công ty hoặc trạng thái.</p></td></tr>
+                        <tr><td colspan="7" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy nhà tuyển dụng</p><p class="mt-1 text-sm text-slate-500">Thử đổi từ khóa, công ty hoặc trạng thái.</p></td></tr>
                     @endforelse
                 </tbody>
             </table>

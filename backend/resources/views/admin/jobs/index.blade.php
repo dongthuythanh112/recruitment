@@ -56,10 +56,11 @@
 
         <div class="relative overflow-x-auto">
             <table class="min-w-full text-left text-sm">
-                <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase"><tr><th class="px-4 py-3.5 sm:px-5">Tin tuyển dụng</th><th class="px-4 py-3.5">Ngành nghề</th><th class="px-4 py-3.5">Người đăng</th><th class="px-4 py-3.5 text-center">Ứng tuyển</th><th class="px-4 py-3.5">Hạn nộp</th>@unless ($status)<th class="px-4 py-3.5">Trạng thái</th>@endunless<th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr></thead>
+                <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase"><tr><th class="w-16 px-4 py-3.5 text-center sm:px-5">STT</th><th class="px-4 py-3.5 sm:px-5">Tin tuyển dụng</th><th class="px-4 py-3.5">Ngành nghề</th><th class="px-4 py-3.5">Người đăng</th><th class="px-4 py-3.5 text-center">Ứng tuyển</th><th class="px-4 py-3.5">Hạn nộp</th>@unless ($status)<th class="px-4 py-3.5">Trạng thái</th>@endunless<th class="px-4 py-3.5 text-right"><span class="sr-only">Thao tác</span></th></tr></thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($jobs as $job)
                         <tr class="group transition-colors hover:bg-sky-50/50">
+                            <td class="px-4 py-3.5 text-center text-xs font-bold tabular-nums text-slate-500 sm:px-5">{{ $jobs->firstItem() + $loop->index }}</td>
                             <td class="min-w-64 px-4 py-3.5 sm:px-5"><div class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 text-sm font-extrabold text-sky-800 ring-1 ring-inset ring-sky-100">{{ mb_strtoupper(mb_substr($job->company->name, 0, 1)) }}</span><span class="min-w-0"><a href="{{ route('admin.jobs.show', $job) }}" class="block max-w-72 truncate font-semibold text-slate-900 transition hover:text-sky-800">{{ $job->title }}</a><span class="mt-0.5 block truncate text-xs text-slate-500">{{ $job->company->name }}</span></span></div></td>
                             <td class="whitespace-nowrap px-4 py-3.5 text-slate-600">{{ $job->industry->name }}</td>
                             <td class="whitespace-nowrap px-4 py-3.5 text-slate-600">{{ $job->creator->name }}</td>
@@ -75,7 +76,7 @@
                             </div></td>
                         </tr>
                     @empty
-                        <tr><td colspan="{{ $status ? 6 : 7 }}" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy tin tuyển dụng</p><p class="mt-1 text-sm text-slate-500">Thử đổi bộ lọc hoặc trạng thái tin.</p></td></tr>
+                        <tr><td colspan="{{ $status ? 7 : 8 }}" class="px-5 py-16 text-center"><p class="font-semibold text-slate-800">Không tìm thấy tin tuyển dụng</p><p class="mt-1 text-sm text-slate-500">Thử đổi bộ lọc hoặc trạng thái tin.</p></td></tr>
                     @endforelse
                 </tbody>
             </table>

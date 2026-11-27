@@ -47,7 +47,7 @@ class RecruiterController extends Controller
 
         return view('admin.recruiters.show', [
             'recruiter' => $recruiter,
-            'jobs' => $recruiter->jobs()->with('industry')->latest()->paginate(10),
+            'jobs' => $recruiter->jobs()->with('industry')->latest()->paginate(15),
         ]);
     }
 

@@ -46,6 +46,7 @@
                         'bg-sky-50/70' => ! $notification->read_at,
                         'hover:bg-slate-50' => $notification->read_at,
                     ])>
+                        <span class="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-xs font-bold tabular-nums text-slate-500 sm:mt-0" aria-label="STT {{ $notifications->firstItem() + $loop->index }}">{{ $notifications->firstItem() + $loop->index }}</span>
                         <span @class([
                             'mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl sm:mt-0',
                             'bg-sky-100 text-sky-800' => ! $notification->read_at,

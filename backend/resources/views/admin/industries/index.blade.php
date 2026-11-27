@@ -46,6 +46,7 @@
             <table class="min-w-full text-left text-sm">
                 <thead class="bg-slate-50/80 text-[11px] font-bold tracking-[0.08em] text-slate-500 uppercase">
                     <tr>
+                        <th scope="col" class="w-16 px-4 py-3.5 text-center sm:px-5">STT</th>
                         <th scope="col" class="px-4 py-3.5 sm:px-5">Ngành nghề</th>
                         <th scope="col" class="px-4 py-3.5">Ngành cha</th>
                         <th scope="col" class="px-4 py-3.5 text-center">Tin tuyển dụng</th>
@@ -57,6 +58,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($industries as $industry)
                         <tr class="group transition-colors hover:bg-sky-50/50">
+                            <td class="px-4 py-3.5 text-center text-xs font-bold tabular-nums text-slate-500 sm:px-5">{{ $industries->firstItem() + $loop->index }}</td>
                             <td class="whitespace-nowrap px-4 py-3.5 sm:px-5">
                                 <div class="flex items-center gap-3">
                                     <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 text-sm font-extrabold text-sky-800 ring-1 ring-inset ring-sky-100">
@@ -102,7 +104,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-16 text-center">
+                            <td colspan="7" class="px-5 py-16 text-center">
                                 <span class="mx-auto grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-400">
                                     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="size-6"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
                                 </span>
