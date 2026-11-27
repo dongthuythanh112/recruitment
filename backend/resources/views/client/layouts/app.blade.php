@@ -60,7 +60,7 @@
                                     <span class="absolute -right-1 -top-3 z-10 min-w-3 text-center text-[10px] font-black leading-none text-red-600 drop-shadow-[0_1px_1px_rgba(255,255,255,0.95)]" style="color:#dc2626">{{ $unreadNotificationsCount > 9 ? '9+' : $unreadNotificationsCount }}</span>
                                 </span>
                             </summary>
-                            <div class="absolute right-0 top-full z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white text-left text-slate-900 shadow-xl shadow-slate-900/15">
+                            <div class="absolute right-0 top-full z-30 mt-2 w-96 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white text-left text-slate-900 shadow-xl shadow-slate-900/15">
                                 <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
                                     <div>
                                         <h2 class="text-sm font-bold">Thông báo</h2>
@@ -77,7 +77,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="max-h-[min(65vh,28rem)] overflow-y-auto overscroll-contain">
+                                <div class="max-h-[min(75vh,36rem)] overflow-y-auto overscroll-contain">
                                     @forelse ($accountNotifications as $notification)
                                         <div class="flex gap-3 border-b border-slate-100 px-3 py-3 last:border-0 {{ $notification->read_at ? '' : 'bg-sky-50/80' }}">
                                             <span class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full {{ $notification->read_at ? 'bg-slate-100 text-slate-500' : 'bg-sky-100 text-sky-800' }}">
@@ -89,7 +89,7 @@
                                                         <span class="min-w-0 flex-1">{{ $notification->title }}</span>
                                                         @unless ($notification->read_at)<span class="mt-1 size-2 shrink-0 rounded-full bg-sky-600" aria-label="Chưa đọc"></span>@endunless
                                                     </span>
-                                                    <span class="mt-0.5 line-clamp-2 block text-xs leading-5 text-slate-600">{{ $notification->content }}</span>
+                                                    <span class="mt-0.5 block whitespace-pre-line break-words text-xs leading-5 text-slate-600">{{ $notification->content }}</span>
                                                     <span class="mt-1 block text-[10px] text-slate-400">{{ $notification->created_at?->format('H:i · d/m/Y') }}</span>
                                                 </a>
                                                 @unless ($notification->read_at)
