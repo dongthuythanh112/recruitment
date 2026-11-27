@@ -217,7 +217,7 @@ class CandidateSearchController extends Controller
             'skills',
             'educations' => fn ($query) => $query->orderByDesc('start_date'),
             'experiences' => fn ($query) => $query->orderByDesc('start_date'),
-            'resumes' => fn ($query) => $query->latest(),
+            'resumes' => fn ($query) => $query->where('is_default', true)->latest(),
         ]);
 
         return view('recruiter.candidates.show', compact('candidate'));
@@ -270,7 +270,7 @@ class CandidateSearchController extends Controller
 
     private function assertResumeBelongsToCandidate(CandidateProfile $candidate, Resume $resume): void
     {
-        abort_unless((int) $resume->candidate_id === (int) $candidate->id, 404);
+        abort_unless((int) $resume->candidate_id === (int) $candidate->id && $resume->is_default, 404);
     }
 
     private function resumeDisk(Resume $resume): string

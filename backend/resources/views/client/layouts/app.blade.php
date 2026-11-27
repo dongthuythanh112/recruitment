@@ -168,9 +168,9 @@
         @yield('content')
     </main>
 
-    <footer class="border-t border-slate-200 bg-white text-sm text-paper/70">
+    <footer class="border-t border-sky-800 bg-sky-900 text-sm text-sky-100">
         <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6">
-            <span class="font-signage text-lg font-bold tracking-wide text-paper uppercase">Việc Ngon</span>
+            <span class="font-signage text-lg font-bold tracking-wide text-white uppercase">Việc Ngon</span>
             <span>© {{ date('Y') }} Bảng việc làm cho người tìm việc và nơi cần người.</span>
         </div>
     </footer>

@@ -56,7 +56,7 @@
                 </section>
 
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <h2 class="font-bold text-slate-900">CV</h2>
+                    <h2 class="font-bold text-slate-900">CV mặc định</h2>
                     @if ($candidate->resumes->isNotEmpty())
                         <ul class="mt-3 space-y-3">
                             @foreach ($candidate->resumes as $resume)
@@ -73,7 +73,7 @@
                             @endforeach
                         </ul>
                     @else
-                        <p class="mt-2 text-sm text-slate-500">Ứng viên chưa tải CV lên.</p>
+                        <p class="mt-2 text-sm text-slate-500">Ứng viên chưa chọn CV mặc định.</p>
                     @endif
                 </section>
 
