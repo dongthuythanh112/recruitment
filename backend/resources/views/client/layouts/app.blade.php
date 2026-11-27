@@ -23,14 +23,17 @@
                 Việc Ngon
             </a>
             <nav class="flex min-w-0 items-center gap-1 text-xs font-medium whitespace-nowrap sm:gap-4 sm:text-sm" aria-label="Điều hướng chính">
-                <a href="{{ route('home') }}#viec-lam" class="board-link hidden sm:inline-flex">Bảng việc làm</a>
-                <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
-                <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                 @auth
                     @if (auth()->user()->role === \App\Models\User::ROLE_RECRUITER)
-                        <a href="{{ route('recruiter.jobs.index') }}" class="board-link text-flap">Quản lý tin</a>
-                        <a href="{{ route('recruiter.applications.index') }}" class="board-link">Ứng viên</a>
-                        <a href="{{ route('recruiter.company.edit') }}" class="board-link">Công ty</a>
+                        <a href="{{ route('home') }}#viec-lam" @if (request()->routeIs('home')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('home')])>Bảng việc làm</a>
+                        <a href="{{ route('recruiter.jobs.index') }}" @if (request()->routeIs('recruiter.jobs.*')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('recruiter.jobs.*')])>Quản lý tin</a>
+                        <a href="{{ route('recruiter.applications.index') }}" @if (request()->routeIs('recruiter.applications.*')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('recruiter.applications.*')])>Ứng viên</a>
+                        <a href="{{ route('recruiter.candidates.index') }}" @if (request()->routeIs('recruiter.candidates.*')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('recruiter.candidates.*')])>Gợi ý ứng viên</a>
+                        <a href="{{ route('recruiter.company.edit') }}" @if (request()->routeIs('recruiter.company.*')) aria-current="page" @endif @class(['board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950', 'bg-sky-50 !text-sky-950' => request()->routeIs('recruiter.company.*')])>Công ty</a>
+                    @else
+                        <a href="{{ route('home') }}#viec-lam" class="board-link hidden rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950 sm:inline-flex">Bảng việc làm</a>
+                        <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
+                        <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                     @endif
                     @php
                         $account = auth()->user();
@@ -127,6 +130,9 @@
                         </div>
                     </details>
                 @else
+                    <a href="{{ route('home') }}#viec-lam" class="board-link hidden rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950 sm:inline-flex">Bảng việc làm</a>
+                    <a href="{{ route('home') }}#tuyen" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Tuyến ngành</a>
+                    <a href="{{ route('home') }}#nha-tuyen-dung" class="board-link rounded-lg text-sky-800 transition-colors hover:bg-sky-50 hover:text-sky-950">Nhà tuyển dụng</a>
                     <a href="{{ route('login') }}" class="board-link">Đăng nhập</a>
                     <a href="{{ route('register') }}" class="inline-flex min-h-9 items-center rounded bg-flap px-3 font-semibold text-ink transition hover:bg-white">Đăng ký</a>
                 @endauth

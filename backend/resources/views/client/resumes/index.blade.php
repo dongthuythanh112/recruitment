@@ -26,6 +26,32 @@
             </div>
         </header>
 
+        <section class="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border {{ $searchableByRecruiters ? 'border-emerald-200 bg-emerald-50/80' : 'border-slate-200 bg-white' }} p-4 shadow-sm sm:px-5">
+            <div class="flex min-w-0 items-start gap-3">
+                <span class="grid size-10 shrink-0 place-items-center rounded-xl {{ $searchableByRecruiters ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                </span>
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h2 class="font-bold text-slate-900">Cho phép nhà tuyển dụng tìm hồ sơ</h2>
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold {{ $searchableByRecruiters ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">{{ $searchableByRecruiters ? 'ĐANG BẬT' : 'ĐANG TẮT' }}</span>
+                    </div>
+                    <p class="mt-1 max-w-2xl text-xs leading-5 text-slate-600">{{ $searchableByRecruiters ? 'Nhà tuyển dụng đã đăng nhập có thể tìm thấy hồ sơ, thông tin liên hệ và xem CV của bạn.' : 'Bật tùy chọn này nếu bạn muốn nhà tuyển dụng đã đăng nhập có thể tìm thấy hồ sơ và xem CV của bạn.' }}</p>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('candidate.resumes.searchability') }}" class="shrink-0">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="searchable" value="{{ $searchableByRecruiters ? 0 : 1 }}">
+                <button type="submit" role="switch" aria-checked="{{ $searchableByRecruiters ? 'true' : 'false' }}" aria-label="{{ $searchableByRecruiters ? 'Tắt tìm kiếm việc làm' : 'Bật tìm kiếm việc làm' }}" class="group inline-flex min-h-10 items-center gap-2.5 rounded-lg px-1 text-sm font-semibold text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+                    <span class="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors {{ $searchableByRecruiters ? 'bg-emerald-600' : 'bg-slate-300 group-hover:bg-slate-400' }}">
+                        <span class="absolute left-1 size-5 rounded-full bg-white shadow-sm transition-transform {{ $searchableByRecruiters ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                    </span>
+                    <span>{{ $searchableByRecruiters ? 'Đang bật' : 'Đang tắt' }}</span>
+                </button>
+            </form>
+        </section>
+
         @if ($errors->any())
             <div role="alert" class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
                 <p class="font-semibold">Không thể tải CV lên.</p>

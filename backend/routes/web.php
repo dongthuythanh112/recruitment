@@ -19,6 +19,7 @@ use App\Http\Controllers\Client\ResumeController as CandidateResumeController;
 use App\Http\Controllers\Client\ProfileController as CandidateProfileController;
 use App\Http\Controllers\Client\SavedJobController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
+use App\Http\Controllers\Recruiter\CandidateSearchController;
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
 use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
 use App\Http\Controllers\Recruiter\JobController as RecruiterJobController;
@@ -61,6 +62,7 @@ Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(functio
     Route::get('cv/{resume}/xem', [CandidateResumeController::class, 'view'])->name('resumes.view');
     Route::get('cv/{resume}/tai', [CandidateResumeController::class, 'download'])->name('resumes.download');
     Route::patch('cv/{resume}/mac-dinh', [CandidateResumeController::class, 'setDefault'])->name('resumes.default');
+    Route::patch('cv/tim-kiem', [CandidateResumeController::class, 'updateSearchability'])->name('resumes.searchability');
     Route::delete('cv/{resume}', [CandidateResumeController::class, 'destroy'])->name('resumes.destroy');
     Route::get('viec-da-luu', [SavedJobController::class, 'index'])->name('saved-jobs.index');
     Route::post('viec-da-luu/{job}', [SavedJobController::class, 'store'])->name('saved-jobs.store');
@@ -73,6 +75,10 @@ Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recrui
     Route::get('thong-tin-cong-ty', [RecruiterCompanyController::class, 'edit'])->name('company.edit');
     Route::put('thong-tin-cong-ty', [RecruiterCompanyController::class, 'update'])->name('company.update');
     Route::get('ung-vien', [RecruiterApplicationController::class, 'index'])->name('applications.index');
+    Route::get('ho-so-ung-vien', [CandidateSearchController::class, 'index'])->name('candidates.index');
+    Route::get('ho-so-ung-vien/{candidate}', [CandidateSearchController::class, 'show'])->name('candidates.show');
+    Route::get('ho-so-ung-vien/{candidate}/cv/{resume}/xem', [CandidateSearchController::class, 'viewResume'])->name('candidates.resumes.view');
+    Route::get('ho-so-ung-vien/{candidate}/cv/{resume}/tai', [CandidateSearchController::class, 'downloadResume'])->name('candidates.resumes.download');
     Route::get('ung-vien/{application}', [RecruiterApplicationController::class, 'show'])->name('applications.show');
     Route::patch('ung-vien/{application}/trang-thai', [RecruiterApplicationController::class, 'updateStatus'])->name('applications.status');
     Route::get('ung-vien/{application}/cv/{resume}/xem', [RecruiterApplicationController::class, 'viewResume'])->name('applications.resumes.view');

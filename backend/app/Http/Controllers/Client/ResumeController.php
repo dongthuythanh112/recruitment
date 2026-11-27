@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CandidateProfile;
 use App\Models\Resume;
 use App\Models\User;
+use App\Services\CandidateSearchability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResumeController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, CandidateSearchability $searchability): View
     {
         $candidate = $this->candidate($request);
         $resumes = $candidate->resumes()
@@ -24,7 +25,26 @@ class ResumeController extends Controller
             ->latest()
             ->get();
 
-        return view('client.resumes.index', compact('resumes'));
+        return view('client.resumes.index', [
+            'resumes' => $resumes,
+            'searchableByRecruiters' => $searchability->isEnabled((int) $candidate->id),
+        ]);
+    }
+
+    public function updateSearchability(Request $request, CandidateSearchability $searchability): RedirectResponse
+    {
+        $candidate = $this->candidate($request);
+        $data = $request->validate(['searchable' => ['required', 'boolean']]);
+        $enabled = (bool) $data['searchable'];
+
+        $searchability->setEnabled((int) $candidate->id, $enabled);
+
+        return redirect()->route('candidate.resumes.index')->with(
+            'success',
+            $enabled
+                ? 'Nhà tuyển dụng có thể tìm và xem hồ sơ của bạn.'
+                : 'Hồ sơ của bạn đã được ẩn khỏi danh sách tìm kiếm của nhà tuyển dụng.',
+        );
     }
 
     public function store(Request $request): RedirectResponse
