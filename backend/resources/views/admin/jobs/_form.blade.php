@@ -25,22 +25,24 @@
         <x-admin.textarea name="benefits" label="Quyền lợi" :value="$job->benefits" />
     </section>
 
-    <fieldset class="rounded-lg border border-slate-200 bg-white p-5">
-        <legend class="px-1 text-sm font-semibold">Kỹ năng yêu cầu</legend>
-        <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            @forelse ($skills as $skillId => $skillName)
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="accent-sky-700" @checked(in_array($skillId, $selectedSkills, true))>
-                    {{ $skillName }}
-                </label>
-            @empty
-                <p class="text-slate-500">Chưa có kỹ năng trong danh mục.</p>
-            @endforelse
-        </div>
-        @error('skills')
-            <p class="mt-1 text-sm text-red-700">{{ $message }}</p>
-        @enderror
-    </fieldset>
+    @if ($job->exists)
+        <fieldset class="rounded-lg border border-slate-200 bg-white p-5">
+            <legend class="px-1 text-sm font-semibold">Kỹ năng yêu cầu</legend>
+            <div class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                @forelse ($skills as $skillId => $skillName)
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="accent-sky-700" @checked(in_array($skillId, $selectedSkills, true))>
+                        {{ $skillName }}
+                    </label>
+                @empty
+                    <p class="text-slate-500">Chưa có kỹ năng trong danh mục.</p>
+                @endforelse
+            </div>
+            @error('skills')
+                <p class="mt-1 text-sm text-red-700">{{ $message }}</p>
+            @enderror
+        </fieldset>
+    @endif
 
     <div class="flex gap-2">
         <x-admin.button>Lưu</x-admin.button>

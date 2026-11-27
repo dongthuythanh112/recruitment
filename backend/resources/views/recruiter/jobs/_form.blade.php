@@ -135,21 +135,23 @@
         </div>
     </section>
 
-    <fieldset class="rounded-2xl border border-ink/10 bg-paper p-5 text-ink sm:p-7">
-        <legend class="px-2 text-lg font-semibold">Kỹ năng yêu cầu</legend>
-        @if ($errors->has('skills')) <p class="mb-3 text-xs text-rose-700">{{ $errors->first('skills') }}</p> @endif
-        <div class="flex flex-wrap gap-x-5 gap-y-3">
-            @forelse ($skills as $skillId => $skillName)
-                <label class="flex cursor-pointer items-center gap-2 text-sm text-ink/75">
-                    <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="size-4 rounded border-ink/25 accent-teal-700" @checked(in_array((int) $skillId, $selectedSkills, true))>
-                    {{ $skillName }}
-                </label>
-            @empty
-                <p class="text-sm text-ink/55">Chưa có kỹ năng trong danh mục.</p>
-            @endforelse
-        </div>
-        @if ($errors->has('skills.*')) <p class="mt-2 text-xs text-rose-700">{{ $errors->first('skills.*') }}</p> @endif
-    </fieldset>
+    @if ($job->exists)
+        <fieldset class="rounded-2xl border border-ink/10 bg-paper p-5 text-ink sm:p-7">
+            <legend class="px-2 text-lg font-semibold">Kỹ năng yêu cầu</legend>
+            @if ($errors->has('skills')) <p class="mb-3 text-xs text-rose-700">{{ $errors->first('skills') }}</p> @endif
+            <div class="flex flex-wrap gap-x-5 gap-y-3">
+                @forelse ($skills as $skillId => $skillName)
+                    <label class="flex cursor-pointer items-center gap-2 text-sm text-ink/75">
+                        <input type="checkbox" name="skills[]" value="{{ $skillId }}" class="size-4 rounded border-ink/25 accent-teal-700" @checked(in_array((int) $skillId, $selectedSkills, true))>
+                        {{ $skillName }}
+                    </label>
+                @empty
+                    <p class="text-sm text-ink/55">Chưa có kỹ năng trong danh mục.</p>
+                @endforelse
+            </div>
+            @if ($errors->has('skills.*')) <p class="mt-2 text-xs text-rose-700">{{ $errors->first('skills.*') }}</p> @endif
+        </fieldset>
+    @endif
 
     <div class="flex flex-wrap gap-3">
         <button type="submit" class="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-flap px-5 text-sm font-semibold text-ink transition hover:bg-white">Lưu nháp</button>
