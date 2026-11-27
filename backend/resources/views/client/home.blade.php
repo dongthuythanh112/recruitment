@@ -28,6 +28,80 @@
         </div>
     </section>
 
+    @if ($candidate)
+        <section class="border-y border-sky-100 bg-sky-50/80">
+            <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Gợi ý dành cho bạn</p>
+                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">
+                            {{ $recommendedJobs->isNotEmpty() ? 'Việc làm phù hợp' : 'Việc làm nổi bật' }}
+                        </h2>
+                        <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+                            {{ $recommendedJobs->isNotEmpty() ? 'Sắp xếp theo mức độ phù hợp với vị trí mong muốn, địa điểm, lương, kinh nghiệm và kỹ năng trong hồ sơ.' : 'Các vị trí đang tuyển được ứng viên quan tâm nhiều trên hệ thống.' }}
+                        </p>
+                    </div>
+                    <a href="{{ route('candidate.profile.edit') }}" class="text-sm font-semibold text-sky-800 hover:text-sky-950">{{ $recommendedJobs->isNotEmpty() ? 'Cập nhật hồ sơ để nhận gợi ý sát hơn' : 'Thêm tiêu chí để nhận gợi ý phù hợp' }} <span aria-hidden="true">→</span></a>
+                </div>
+
+                @if ($recommendedJobs->isNotEmpty())
+                    <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        @foreach ($recommendedJobs as $suggestion)
+                            @php($job = $suggestion['job'])
+                            <a href="{{ route('jobs.show', $job->slug) }}" class="group flex min-h-48 flex-col rounded-2xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <h3 class="line-clamp-2 font-bold leading-6 text-slate-900 transition group-hover:text-sky-800">{{ $job->title }}</h3>
+                                        <p class="mt-1 truncate text-sm text-slate-600">{{ $job->company->name }}</p>
+                                    </div>
+                                    <span class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">Phù hợp</span>
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-2 text-xs text-slate-600">
+                                    <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ $job->location ?: 'Linh hoạt địa điểm' }}</span>
+                                    <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ $job->salaryShort() }}</span>
+                                    @if ($job->experience_years !== null)
+                                        <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ number_format((float) $job->experience_years, 1, ',', '') }}+ năm kinh nghiệm</span>
+                                    @endif
+                                </div>
+                                <div class="mt-auto flex flex-wrap gap-1.5 pt-4">
+                                    @foreach ($suggestion['reasons'] as $reason)
+                                        <span class="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[10px] font-medium text-sky-800">{{ $reason }}</span>
+                                    @endforeach
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if ($featuredJobs->isNotEmpty())
+                    <div class="{{ $recommendedJobs->isNotEmpty() ? 'mt-8 border-t border-sky-200 pt-7' : 'mt-5' }}">
+                        @if ($recommendedJobs->isNotEmpty())
+                            <h3 class="font-signage text-xl font-bold tracking-wide text-slate-800 uppercase">Việc đang tuyển nổi bật</h3>
+                        @endif
+                        <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                            @foreach ($featuredJobs as $job)
+                                <a href="{{ route('jobs.show', $job->slug) }}" class="group flex items-center justify-between gap-4 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-300 hover:shadow-md">
+                                    <span class="min-w-0">
+                                        <span class="block truncate text-sm font-bold text-slate-900 group-hover:text-sky-800">{{ $job->title }}</span>
+                                        <span class="mt-1 block truncate text-xs text-slate-500">{{ $job->company->name }} · {{ $job->location ?: 'Linh hoạt' }}</span>
+                                    </span>
+                                    <span class="shrink-0 text-xs font-semibold text-sky-800">{{ $job->salaryShort() }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if ($recommendedJobs->isEmpty() && $featuredJobs->isEmpty())
+                    <div class="mt-5 rounded-2xl border border-dashed border-sky-200 bg-white px-5 py-8 text-center">
+                        <p class="font-semibold text-slate-800">Chưa có vị trí phù hợp để gợi ý</p>
+                        <p class="mt-1 text-sm text-slate-500">Tin tuyển dụng mới sẽ xuất hiện tại đây sau khi được duyệt.</p>
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endif
+
     <section id="viec-lam" class="mx-auto max-w-6xl scroll-mt-14 px-4 pb-14">
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">

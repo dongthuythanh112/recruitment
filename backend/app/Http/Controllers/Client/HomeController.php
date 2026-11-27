@@ -7,13 +7,15 @@ use App\Models\CandidateProfile;
 use App\Models\Company;
 use App\Models\Industry;
 use App\Models\Job;
+use App\Models\User;
+use App\Services\JobRecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, JobRecommendationService $recommendations): View
     {
         // Trang công khai: tham số dạng mảng (?q[]=x) không được lọt xuống câu truy vấn.
         $filters = $request->validate([
@@ -22,6 +24,13 @@ class HomeController extends Controller
             'industry_id' => ['nullable', 'integer'],
         ]);
         $industry = isset($filters['industry_id']) ? Industry::find($filters['industry_id']) : null;
+        $candidate = $request->user()?->role === User::ROLE_CANDIDATE
+            && $request->user()?->status === User::STATUS_ACTIVE
+                ? ($request->user()->candidateProfile()->with('skills')->first() ?? new CandidateProfile())
+                : null;
+        $jobSuggestions = $candidate
+            ? $recommendations->recommend($candidate)
+            : ['matched' => collect(), 'featured' => collect()];
 
         $jobs = Job::published()
             ->with('company')
@@ -37,6 +46,9 @@ class HomeController extends Controller
 
         return view('client.home', [
             'jobs' => $jobs,
+            'candidate' => $candidate,
+            'recommendedJobs' => $jobSuggestions['matched'],
+            'featuredJobs' => $jobSuggestions['featured'],
             'isFiltered' => array_filter($filters) !== [],
             'openJobsCount' => Job::published()->count(),
             'hiringCompaniesCount' => Job::published()->distinct()->count('company_id'),
