@@ -59,21 +59,21 @@ class ApplicationController extends Controller
         $application->load([
             'job.company',
             'candidate.user',
-            'candidate.resumes',
             'candidate.educations' => fn ($query) => $query->orderByDesc('start_date'),
             'candidate.experiences' => fn ($query) => $query->orderByDesc('start_date'),
             'candidate.skills',
             'resume',
             'statusHistories' => fn ($query) => $query->with('changer')->latest('created_at'),
         ]);
-        $resumeAvailability = $application->candidate->resumes
-            ->mapWithKeys(fn (Resume $resume) => [$resume->id => $this->findResumeDisk($resume) !== null]);
+        $resumeAvailable = $application->resume
+            ? $this->findResumeDisk($application->resume) !== null
+            : false;
 
         return view('recruiter.applications.show', [
             'application' => $application,
             'statusLabels' => Application::STATUS_LABELS,
             'editableStatuses' => Application::RECRUITER_STATUS_LABELS,
-            'resumeAvailability' => $resumeAvailability,
+            'resumeAvailable' => $resumeAvailable,
         ]);
     }
 
@@ -180,7 +180,12 @@ class ApplicationController extends Controller
 
     private function assertResumeBelongsToCandidate(Application $application, Resume $resume): void
     {
-        abort_unless((int) $resume->candidate_id === (int) $application->candidate_id, 404);
+        abort_unless(
+            $application->resume_id !== null
+                && (int) $resume->id === (int) $application->resume_id
+                && (int) $resume->candidate_id === (int) $application->candidate_id,
+            404,
+        );
     }
 
     private function resumeDisk(Resume $resume): string

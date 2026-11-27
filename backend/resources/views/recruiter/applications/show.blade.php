@@ -138,35 +138,29 @@
                         <h2 class="text-lg font-semibold">CV ứng viên</h2>
                         @if ($application->resume)
                             <p class="mt-1 text-xs text-teal-800">CV này được đính kèm trong hồ sơ ứng tuyển.</p>
-                        @endif
-                        <ul class="mt-4 space-y-3">
-                            @forelse ($candidate->resumes as $resume)
-                                @php($isPdf = strtolower(pathinfo($resume->original_filename ?: $resume->file_path, PATHINFO_EXTENSION)) === 'pdf')
-                                <li class="rounded-xl border {{ $application->resume_id === $resume->id ? 'border-teal-300 bg-teal-50/70' : 'border-ink/10 bg-white' }} p-3">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="min-w-0">
-                                            <p class="break-words text-sm font-medium">{{ $resume->title }}</p>
-                                            <p class="mt-1 break-all text-xs text-ink/50">{{ $resume->original_filename ?: $resume->file_path }}</p>
-                                        </div>
-                                        @if ($resume->is_default)
-                                            <span class="shrink-0 rounded-full bg-ink/5 px-2 py-1 text-[10px] font-semibold text-ink/60">Mặc định</span>
-                                        @endif
+                            @php($resume = $application->resume)
+                            @php($isPdf = strtolower(pathinfo($resume->original_filename ?: $resume->file_path, PATHINFO_EXTENSION)) === 'pdf')
+                            <div class="mt-4 rounded-xl border border-teal-300 bg-teal-50/70 p-3">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="min-w-0">
+                                        <p class="break-words text-sm font-medium">{{ $resume->title }}</p>
+                                        <p class="mt-1 break-all text-xs text-ink/50">{{ $resume->original_filename ?: $resume->file_path }}</p>
                                     </div>
-                                    @if ($resumeAvailability->get($resume->id, false))
-                                        <div class="mt-3 flex flex-wrap gap-2">
-                                            @if ($isPdf)
-                                                <a href="{{ route('recruiter.applications.resumes.view', [$application, $resume]) }}" target="_blank" rel="noopener" class="inline-flex min-h-8 items-center rounded-lg border border-ink/15 px-3 text-xs font-medium transition hover:border-teal-700 hover:text-teal-800">Xem CV</a>
-                                            @endif
-                                            <a href="{{ route('recruiter.applications.resumes.download', [$application, $resume]) }}" class="inline-flex min-h-8 items-center rounded-lg bg-ink px-3 text-xs font-semibold text-white transition hover:bg-teal-800">Tải xuống</a>
-                                        </div>
-                                    @else
-                                        <p class="mt-3 text-xs text-amber-800">Tệp CV hiện không có trên hệ thống.</p>
-                                    @endif
-                                </li>
-                            @empty
-                                <li class="text-sm text-ink/50">Ứng viên chưa có CV.</li>
-                            @endforelse
-                        </ul>
+                                </div>
+                                @if ($resumeAvailable)
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        @if ($isPdf)
+                                            <a href="{{ route('recruiter.applications.resumes.view', [$application, $resume]) }}" target="_blank" rel="noopener" class="inline-flex min-h-8 items-center rounded-lg border border-ink/15 px-3 text-xs font-medium transition hover:border-teal-700 hover:text-teal-800">Xem CV</a>
+                                        @endif
+                                        <a href="{{ route('recruiter.applications.resumes.download', [$application, $resume]) }}" class="inline-flex min-h-8 items-center rounded-lg bg-ink px-3 text-xs font-semibold text-white transition hover:bg-teal-800">Tải xuống</a>
+                                    </div>
+                                @else
+                                    <p class="mt-3 text-xs text-amber-800">Tệp CV hiện không có trên hệ thống.</p>
+                                @endif
+                            </div>
+                        @else
+                            <p class="mt-3 rounded-xl bg-slate-50 px-3 py-4 text-sm text-ink/60">Ứng viên không đính kèm CV trong đơn ứng tuyển này.</p>
+                        @endif
                     </section>
 
                     <section class="rounded-2xl border border-ink/10 bg-paper p-5 text-ink sm:p-6">
