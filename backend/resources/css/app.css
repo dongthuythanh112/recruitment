@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 
+html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -81,7 +86,9 @@
     }
 
     .board-link:hover {
-        text-decoration: underline;
+        border-radius: 0.5rem;
+        background-color: #f0f9ff;
+        text-decoration: none;
     }
 
     .board-field {

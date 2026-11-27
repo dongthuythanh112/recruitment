@@ -20,6 +20,7 @@ use App\Http\Controllers\Client\ProfileController as CandidateProfileController;
 use App\Http\Controllers\Client\SavedJobController;
 use App\Http\Controllers\Recruiter\CompanyController as RecruiterCompanyController;
 use App\Http\Controllers\Recruiter\CandidateSearchController;
+use App\Http\Controllers\Recruiter\NotificationController as RecruiterNotificationController;
 use App\Http\Controllers\Recruiter\ProfileController as RecruiterProfileController;
 use App\Http\Controllers\Recruiter\ApplicationController as RecruiterApplicationController;
 use App\Http\Controllers\Recruiter\JobController as RecruiterJobController;
@@ -70,6 +71,10 @@ Route::prefix('ung-vien')->name('candidate.')->middleware('auth')->group(functio
 });
 
 Route::prefix('nha-tuyen-dung')->name('recruiter.')->middleware(['auth', 'recruiter'])->group(function () {
+    Route::get('thong-bao', [RecruiterNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('thong-bao/{notification}/open', [RecruiterNotificationController::class, 'open'])->name('notifications.open');
+    Route::patch('thong-bao/{notification}/read', [RecruiterNotificationController::class, 'markRead'])->name('notifications.read');
+    Route::patch('thong-bao/read-all', [RecruiterNotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::get('ho-so', [RecruiterProfileController::class, 'edit'])->name('profile.edit');
     Route::put('ho-so', [RecruiterProfileController::class, 'update'])->name('profile.update');
     Route::get('thong-tin-cong-ty', [RecruiterCompanyController::class, 'edit'])->name('company.edit');

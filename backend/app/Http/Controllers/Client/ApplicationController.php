@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Job;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -102,6 +103,17 @@ class ApplicationController extends Controller
                 'note' => $oldStatus === 'withdrawn' ? 'Ứng viên gửi lại hồ sơ ứng tuyển.' : 'Ứng viên nộp hồ sơ.',
             ]);
 
+            Notification::create([
+                'user_id' => $publishedJob->created_by,
+                'type' => 'application.submitted',
+                'title' => 'Có ứng viên mới ứng tuyển',
+                'content' => $request->user()->name.' đã ứng tuyển vị trí "'.$publishedJob->title.'".',
+                'data' => [
+                    'application_id' => $application->id,
+                    'job_id' => $publishedJob->id,
+                ],
+            ]);
+
             return 'submitted';
         });
 
@@ -132,6 +144,18 @@ class ApplicationController extends Controller
                 'new_status' => 'withdrawn',
                 'changed_by' => $request->user()->id,
                 'note' => 'Ứng viên đã rút hồ sơ.',
+            ]);
+
+            $job = $current->job()->first();
+            Notification::create([
+                'user_id' => $job->created_by,
+                'type' => 'application.withdrawn',
+                'title' => 'Ứng viên đã rút hồ sơ',
+                'content' => $request->user()->name.' đã rút hồ sơ ứng tuyển vị trí "'.$job->title.'".',
+                'data' => [
+                    'application_id' => $current->id,
+                    'job_id' => $job->id,
+                ],
             ]);
 
             return 'withdrawn';
