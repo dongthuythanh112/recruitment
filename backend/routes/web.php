@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\IndustryController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\JobModerationController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RecruiterController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Client\HomeController;
@@ -87,6 +88,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
+        Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+        Route::patch('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::patch('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
         Route::redirect('/', '/admin/statistics');
         Route::get('statistics', [StatisticController::class, 'index'])->name('statistics.index');

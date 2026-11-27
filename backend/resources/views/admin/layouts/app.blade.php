@@ -11,12 +11,14 @@
 @php
     $menu = [
         ['label' => 'Thống kê', 'route' => 'admin.statistics.index', 'active' => 'admin.statistics.*', 'icon' => 'chart'],
+        ['label' => 'Thông báo', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications.*', 'icon' => 'bell'],
         ['label' => 'Ứng viên', 'route' => 'admin.candidates.index', 'active' => 'admin.candidates.*', 'icon' => 'users'],
         ['label' => 'Nhà tuyển dụng', 'route' => 'admin.recruiters.index', 'active' => 'admin.recruiters.*', 'icon' => 'briefcase'],
         ['label' => 'Tin tuyển dụng', 'route' => 'admin.jobs.index', 'active' => 'admin.jobs.*', 'icon' => 'document'],
         ['label' => 'Ngành nghề', 'route' => 'admin.industries.index', 'active' => 'admin.industries.*', 'icon' => 'grid'],
     ];
     $account = auth()->user();
+    $unreadNotificationsCount = $account->userNotifications()->whereNull('read_at')->count();
 @endphp
 
 <div class="min-h-screen lg:flex">
@@ -50,12 +52,22 @@
                                 @case('briefcase')<rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-13 5h18m-11 0v2h4v-2" />@break
                                 @case('document')<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Zm0 0v6h6M8 13h8m-8 4h8" />@break
                                 @case('grid')<rect x="3" y="3" width="8" height="8" rx="1.5" /><rect x="13" y="3" width="8" height="8" rx="1.5" /><rect x="3" y="13" width="8" height="8" rx="1.5" /><rect x="13" y="13" width="8" height="8" rx="1.5" />@break
+                                @case('bell')<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4" />@break
                             @endswitch
                         </svg>
                     </span>
                     <span class="whitespace-nowrap">{{ $item['label'] }}</span>
+                    @if ($item['icon'] === 'bell')
+                        <span @class([
+                            'ml-auto min-w-5 rounded-full px-2 py-0.5 text-center text-[10px] font-extrabold tabular-nums shadow-sm',
+                            'bg-sky-900 text-white ring-2 ring-sky-100' => $unreadNotificationsCount > 0,
+                            'bg-slate-200 text-slate-800' => $unreadNotificationsCount === 0,
+                        ]) aria-label="{{ $unreadNotificationsCount }} thông báo chưa đọc">{{ $unreadNotificationsCount > 99 ? '99+' : $unreadNotificationsCount }}</span>
+                    @endif
                     @if ($isActive)
-                        <span class="ml-auto hidden h-5 w-1 rounded-full bg-sky-600 lg:block" aria-hidden="true"></span>
+                        @unless ($item['icon'] === 'bell')
+                            <span class="ml-auto hidden h-5 w-1 rounded-full bg-sky-600 lg:block" aria-hidden="true"></span>
+                        @endunless
                     @endif
                 </a>
             @endforeach

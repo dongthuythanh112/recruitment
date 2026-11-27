@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Recruiter;
 use App\Http\Controllers\Controller;
 use App\Models\Industry;
 use App\Models\Job;
+use App\Models\Notification;
 use App\Models\RecruiterProfile;
 use App\Models\Skill;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -231,6 +233,23 @@ class JobController extends Controller
             }
 
             $current->update(['status' => $to, ...$extra]);
+
+            if ($to === Job::STATUS_PENDING) {
+                $adminIds = User::query()
+                    ->where('role', User::ROLE_ADMIN)
+                    ->where('status', User::STATUS_ACTIVE)
+                    ->pluck('id');
+
+                foreach ($adminIds as $adminId) {
+                    Notification::create([
+                        'user_id' => $adminId,
+                        'type' => 'job.pending_review',
+                        'title' => 'Tin tuyển dụng cần duyệt',
+                        'content' => 'Tin "'.$current->title.'" đã được gửi lên và đang chờ admin xét duyệt.',
+                        'data' => ['job_id' => $current->id],
+                    ]);
+                }
+            }
 
             return true;
         });
