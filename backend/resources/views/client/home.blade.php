@@ -5,8 +5,6 @@
 
 @section('content')
     @php
-        // Màu tuyến cố định theo thứ tự, như sơ đồ tàu điện.
-        $lineColors = ['#d63a1f', '#0b6e4f', '#1f5fbf', '#c77700', '#0e7c86', '#8a3b1e', '#3d4a5c', '#b5245f'];
         $mailto = 'mailto:'.config('app.contact_email').'?subject='.rawurlencode('Đăng tin tuyển dụng trên Ga Việc');
     @endphp
 
@@ -60,152 +58,177 @@
             </div>
         </div>
     </section>
-    @if ($candidate)
+    @if ($homeSuggestions->isNotEmpty())
         <section class="border-y border-sky-100 bg-sky-50/80">
             <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Gợi ý dành cho bạn</p>
-                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">
-                            {{ $recommendedJobs->isNotEmpty() ? 'Việc làm phù hợp' : 'Việc làm nổi bật' }}
-                        </h2>
+                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Gợi ý việc làm</h2>
                         <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                            {{ $recommendedJobs->isNotEmpty() ? 'Sắp xếp theo mức độ phù hợp với vị trí mong muốn, địa điểm, lương, kinh nghiệm và kỹ năng trong hồ sơ.' : 'Các vị trí đang tuyển được ứng viên quan tâm nhiều trên hệ thống.' }}
+                            {{ $candidate ? 'Các cơ hội việc làm có thể phù hợp với bạn.' : 'Những cơ hội mới đăng gần đây trên hệ thống.' }}
                         </p>
                     </div>
-                    <a href="{{ route('candidate.profile.edit') }}" class="text-sm font-semibold text-sky-800 hover:text-sky-950">{{ $recommendedJobs->isNotEmpty() ? 'Cập nhật hồ sơ để nhận gợi ý sát hơn' : 'Thêm tiêu chí để nhận gợi ý phù hợp' }} <span aria-hidden="true">→</span></a>
+                    @if ($candidate || auth()->guest())
+                        <a href="{{ route('candidate.recommendations.index') }}" class="inline-flex min-h-10 items-center gap-2 rounded-lg border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:border-sky-400 hover:bg-sky-50">
+                            Xem thêm <span aria-hidden="true">→</span>
+                        </a>
+                    @endif
                 </div>
-
-                @if ($recommendedJobs->isNotEmpty())
-                    <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        @foreach ($recommendedJobs as $suggestion)
-                            @php($job = $suggestion['job'])
-                            <a href="{{ route('jobs.show', $job->slug) }}" class="group flex min-h-48 flex-col rounded-2xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <h3 class="line-clamp-2 font-bold leading-6 text-slate-900 transition group-hover:text-sky-800">{{ $job->title }}</h3>
-                                        <p class="mt-1 truncate text-sm text-slate-600">{{ $job->company->name }}</p>
-                                    </div>
-                                    <span class="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">Phù hợp</span>
-                                </div>
-                                <div class="mt-4 flex flex-wrap gap-2 text-xs text-slate-600">
-                                    <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ $job->location ?: 'Linh hoạt địa điểm' }}</span>
-                                    <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ $job->salaryShort() }}</span>
-                                    @if ($job->experience_years !== null)
-                                        <span class="rounded-lg bg-slate-50 px-2.5 py-1.5">{{ number_format((float) $job->experience_years, 1, ',', '') }}+ năm kinh nghiệm</span>
-                                    @endif
-                                </div>
-                                <div class="mt-auto flex flex-wrap gap-1.5 pt-4">
-                                    @foreach ($suggestion['reasons'] as $reason)
-                                        <span class="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[10px] font-medium text-sky-800">{{ $reason }}</span>
-                                    @endforeach
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                @endif
-
-                @if ($featuredJobs->isNotEmpty())
-                    <div class="{{ $recommendedJobs->isNotEmpty() ? 'mt-8 border-t border-sky-200 pt-7' : 'mt-5' }}">
-                        @if ($recommendedJobs->isNotEmpty())
-                            <h3 class="font-signage text-xl font-bold tracking-wide text-slate-800 uppercase">Việc đang tuyển nổi bật</h3>
-                        @endif
-                        <div class="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                            @foreach ($featuredJobs as $job)
-                                <a href="{{ route('jobs.show', $job->slug) }}" class="group flex items-center justify-between gap-4 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-300 hover:shadow-md">
-                                    <span class="min-w-0">
-                                        <span class="block truncate text-sm font-bold text-slate-900 group-hover:text-sky-800">{{ $job->title }}</span>
-                                        <span class="mt-1 block truncate text-xs text-slate-500">{{ $job->company->name }} · {{ $job->location ?: 'Linh hoạt' }}</span>
-                                    </span>
-                                    <span class="shrink-0 text-xs font-semibold text-sky-800">{{ $job->salaryShort() }}</span>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if ($recommendedJobs->isEmpty() && $featuredJobs->isEmpty())
-                    <div class="mt-5 rounded-2xl border border-dashed border-sky-200 bg-white px-5 py-8 text-center">
-                        <p class="font-semibold text-slate-800">Chưa có vị trí phù hợp để gợi ý</p>
-                        <p class="mt-1 text-sm text-slate-500">Tin tuyển dụng mới sẽ xuất hiện tại đây sau khi được duyệt.</p>
-                    </div>
-                @endif
+                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($homeSuggestions as $suggestion)
+                        @php($job = $suggestion['job'])
+                        @include('client.partials.home-job-card', ['job' => $job])
+                    @endforeach
+                </div>
             </div>
         </section>
     @endif
-
-    <section id="viec-lam" class="mx-auto max-w-6xl scroll-mt-14 px-4 pb-14">
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
-                <h2 class="font-signage text-3xl font-bold tracking-wide uppercase">
-                    {{ $isFiltered ? 'Kết quả tìm kiếm ('.$jobs->total().')' : 'Việc đang tuyển' }}
-                </h2>
-                <div class="flex items-center gap-4">
-                    @if ($isFiltered)
-                        <a href="{{ route('home') }}#viec-lam" class="board-link text-flap">Xóa bộ lọc</a>
-                    @endif
-                    <time class="flap" data-clock>{{ now()->format('H:i') }}</time>
+    <section id="viec-lam" class="scroll-mt-14 border-y border-sky-100 bg-sky-50/80">
+        <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">{{ $isFiltered ? 'Kết quả tìm kiếm' : 'Khám phá cơ hội' }}</p>
+                    <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">
+                        {{ $isFiltered ? 'Kết quả tìm kiếm ('.$jobs->total().')' : 'Việc làm nổi bật' }}
+                    </h2>
+                    @unless ($isFiltered)
+                        <p class="mt-1 text-sm leading-6 text-slate-600">Những vị trí đang tuyển được cập nhật mới nhất.</p>
+                    @endunless
                 </div>
+                @if ($isFiltered)
+                    <a href="{{ route('home') }}#viec-lam" class="inline-flex min-h-10 items-center rounded-lg border border-sky-200 bg-white px-4 text-sm font-semibold text-sky-800 shadow-sm transition hover:border-sky-400 hover:bg-sky-50">Xóa bộ lọc</a>
+                @endif
             </div>
 
             @if ($jobs->isEmpty())
-                <p class="px-4 py-14 text-center text-paper/70">
-                    {{ $isFiltered ? 'Không có việc làm nào khớp với tìm kiếm của bạn. Hãy thử từ khóa khác.' : 'Hiện chưa có việc làm nào đang tuyển.' }}
-                </p>
-            @else
-                <div class="hidden grid-cols-[minmax(0,1fr)_11rem_12rem_11.5rem_1.25rem] gap-x-6 border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs tracking-wider text-paper/60 uppercase lg:grid" aria-hidden="true">
-                    <span>Vị trí</span><span>Nơi làm</span><span>Lương</span><span>Trạng thái</span>
+                <div class="mt-5 rounded-2xl border border-dashed border-sky-200 bg-white px-5 py-12 text-center">
+                    <p class="font-semibold text-slate-800">{{ $isFiltered ? 'Không tìm thấy việc làm phù hợp.' : 'Hiện chưa có việc làm nào đang tuyển.' }}</p>
+                    @if ($isFiltered)
+                        <p class="mt-1 text-sm text-slate-500">Hãy thử thay đổi từ khóa hoặc bộ lọc địa điểm, ngành nghề.</p>
+                    @endif
                 </div>
-                @foreach ($jobs as $job)
-                    @include('client.partials.job-row')
-                @endforeach
-                {{ $jobs->links('client.partials.pagination') }}
+            @else
+                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($jobs as $job)
+                        @include('client.partials.home-job-card', ['job' => $job])
+                    @endforeach
+                </div>
+                <div class="mt-7">{{ $jobs->links('client.partials.pagination') }}</div>
             @endif
         </div>
     </section>
 
-    @if ($industries->isNotEmpty() || $companies->isNotEmpty())
-        <section id="tuyen" class="scroll-mt-14 bg-paper text-ink">
-            <div class="mx-auto grid max-w-6xl gap-12 px-4 py-14 lg:grid-cols-[1.4fr_1fr]">
-                <div>
-                    <h2 class="font-signage text-4xl font-extrabold tracking-wide uppercase">Sơ đồ tuyến ngành nghề</h2>
-                    <p class="mt-2 text-ink/75">Mỗi ga trên tuyến là một vị trí đang mở. Chọn một tuyến để lọc bảng.</p>
-                    <ul class="mt-6 space-y-2">
-                        @foreach ($industries as $industry)
-                            <li>
-                                <a href="{{ route('home', ['industry_id' => $industry->id]) }}#viec-lam" class="transit-line" style="--line: {{ $lineColors[$loop->index % count($lineColors)] }}">
-                                    <span class="flex items-baseline justify-between gap-3">
-                                        <span class="font-semibold">{{ $industry->name }}</span>
-                                        <span class="text-sm whitespace-nowrap text-ink/75">{{ $industry->open_jobs_count }} ga</span>
-                                    </span>
-                                    <span aria-hidden="true" class="transit-track">
-                                        @foreach (range(1, min($industry->open_jobs_count, 16)) as $stop)
-                                            <span class="transit-stop"></span>
-                                        @endforeach
-                                    </span>
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+    @if ($industries->isNotEmpty())
+        @php($industryPages = $industries->chunk(8))
+        <section id="top-nganh-nghe" class="bg-white">
+            <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Khám phá theo lĩnh vực</p>
+                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Top ngành nghề nổi bật</h2>
+                        <p class="mt-1 text-sm leading-6 text-slate-600">Các ngành có nhiều tin tuyển dụng nhất hiện nay.</p>
+                    </div>
+                    @if ($industryPages->count() > 1)
+                        <div class="flex items-center gap-2">
+                            <button type="button" aria-label="Trang ngành nghề trước" data-industry-prev class="grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-100">
+                                <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M12.78 4.22a.75.75 0 0 1 0 1.06L8.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>
+                            </button>
+                            <span class="min-w-12 text-center text-xs font-semibold tabular-nums text-slate-500"><span data-industry-current>1</span> / {{ $industryPages->count() }}</span>
+                            <button type="button" aria-label="Trang ngành nghề tiếp" data-industry-next class="grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-100">
+                                <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M7.22 4.22a.75.75 0 0 1 1.06 0l5.25 5.25a.75.75 0 0 1 0 1.06l-5.25 5.25a.75.75 0 1 1-1.06-1.06L11.94 10 7.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
+                            </button>
+                        </div>
+                    @endif
                 </div>
-                <div>
-                    <h2 class="font-signage text-4xl font-extrabold tracking-wide uppercase">Công ty đang tuyển</h2>
-                    <ul class="mt-6 divide-y divide-ink/15 border-y border-ink/15">
-                        @foreach ($companies as $company)
-                            <li>
-                                <a href="{{ route('home', ['q' => $company->name]) }}#viec-lam" class="flex min-h-14 items-center justify-between gap-4 py-2 hover:text-signal">
-                                    <span class="font-medium">{{ $company->name }}</span>
-                                    <span class="text-sm whitespace-nowrap text-ink/75">{{ $company->open_jobs_count }} vị trí</span>
+
+                <div class="mt-5" data-industry-carousel data-interval="5500">
+                    @foreach ($industryPages as $page)
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 {{ $loop->first ? '' : 'hidden' }}" data-industry-page aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                            @foreach ($page as $industry)
+                                <a href="{{ route('home', ['industry_id' => $industry->id]) }}#viec-lam" class="group flex min-h-40 flex-col items-center rounded-2xl border border-sky-100 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md sm:min-h-44 sm:p-5">
+                                    <span class="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-100 text-sky-800 transition group-hover:from-sky-100 group-hover:to-cyan-200 sm:size-14">
+                                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="size-6 sm:size-7">
+                                            @switch($industry->home_icon)
+                                                @case('technology') <rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4M7 8h4m-4 4h8"/> @break
+                                                @case('finance') <rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18m-13 4h3m-3 3h6M7 3h10"/> @break
+                                                @case('marketing') <path d="M4 13V9a2 2 0 0 1 2-2h3l9-4v16l-9-4H6a2 2 0 0 1-2-2Zm5 2 2 6h4l-3-7m9-5 2-2m-2 10 2 2"/> @break
+                                                @case('design') <path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.5 1.5 0 0 1 1.1-2.6H18a3 3 0 0 0 3-3c0-5-4-9-9-9Z"/><path d="M7.5 10h.01M11 7h.01M15.5 9h.01"/> @break
+                                                @case('health') <path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/><path d="M12 8v6m-3-3h6"/> @break
+                                                @case('education') <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H12v17H5.5A2.5 2.5 0 0 0 3 22V5.5Zm18 0A2.5 2.5 0 0 0 18.5 3H12v17h6.5A2.5 2.5 0 0 1 21 22V5.5Z"/> @break
+                                                @case('logistics') <path d="M3 6h11v11H3zM14 10h4l3 4v3h-7z"/><circle cx="7.5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/> @break
+                                                @case('hospitality') <path d="M4 3v7m4-7v7M4 7h4m-2 3v11m10-18v18m0-18c-3 2-3 6 0 8"/> @break
+                                                @case('people') <circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m3-15a3 3 0 0 1 0 6m3 9v-1a6 6 0 0 0-4-5.65"/> @break
+                                                @case('legal') <path d="M12 3v18m-7-15h14M5 6 2 13h6L5 6Zm14 0-3 7h6l-3-7ZM7 21h10"/> @break
+                                                @case('building') <path d="M4 21V5a2 2 0 0 1 2-2h8v18M14 9h4a2 2 0 0 1 2 2v10M2 21h20M8 7h2m-2 4h2m-2 4h2m8-2h.01m-0.01 4h.01"/> @break
+                                                @case('engineering') <path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4L15 12l-3-3 2.7-2.7Z"/> @break
+                                                @case('sales') <path d="M4 19V5m0 14h17M7 15l4-4 3 2 6-7m-4 0h4v4"/> @break
+                                                @case('science') <path d="M9 3h6m-5 0v6l-5.5 9A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3L14 9V3M7 16h10"/> @break
+                                                @default <rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m-13 5h18m-11 0v2h4v-2"/>
+                                            @endswitch
+                                        </svg>
+                                    </span>
+                                    <span class="mt-3 line-clamp-2 min-h-10 text-sm font-bold leading-5 text-slate-800 transition group-hover:text-sky-800">{{ $industry->name }}</span>
+                                    <span class="mt-auto pt-2 text-xs font-medium text-slate-500">{{ number_format($industry->open_jobs_count) }} tin tuyển dụng</span>
                                 </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                            @endforeach
+                        </div>
+                    @endforeach
                 </div>
+                @if ($industryPages->count() > 1)
+                    <div class="mt-5 flex justify-center gap-2" aria-label="Chọn trang ngành nghề">
+                        @foreach ($industryPages as $page)
+                            <button type="button" aria-label="Trang ngành nghề {{ $loop->iteration }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" data-industry-dot="{{ $loop->index }}" class="h-2.5 rounded-full transition-all {{ $loop->first ? 'w-7 bg-sky-700' : 'w-2.5 bg-sky-200 hover:bg-sky-400' }}"></button>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </section>
     @endif
+    @if ($companies->isNotEmpty())
+        @php($companyPages = $companies->chunk(5))
+        <section id="tuyen" class="scroll-mt-14 border-y border-sky-100 bg-sky-50/80">
+            <div class="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Cơ hội từ các doanh nghiệp hàng đầu</p>
+                        <h2 class="mt-2 font-signage text-3xl font-extrabold tracking-wide text-slate-900 uppercase sm:text-4xl">Nhà tuyển dụng nổi bật</h2>
+                    </div>
+                    @if ($companyPages->count() > 1)
+                        <div class="flex items-center gap-2">
+                            <button type="button" aria-label="Nhà tuyển dụng trước" data-company-prev class="grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-100">
+                                <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M12.78 4.22a.75.75 0 0 1 0 1.06L8.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>
+                            </button>
+                            <span class="min-w-12 text-center text-xs font-semibold tabular-nums text-slate-500"><span data-company-current>1</span> / {{ $companyPages->count() }}</span>
+                            <button type="button" aria-label="Nhà tuyển dụng tiếp" data-company-next class="grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 focus:outline-none focus:ring-4 focus:ring-sky-100">
+                                <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="size-4"><path fill-rule="evenodd" d="M7.22 4.22a.75.75 0 0 1 1.06 0l5.25 5.25a.75.75 0 0 1 0 1.06l-5.25 5.25a.75.75 0 1 1-1.06-1.06L11.94 10 7.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
+                            </button>
+                        </div>
+                    @endif
+                </div>
 
-    <section id="nha-tuyen-dung" class="scroll-mt-14 bg-flap text-ink">
+                <div class="mt-5" data-company-carousel data-interval="5500">
+                    @foreach ($companyPages as $page)
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4 {{ $loop->first ? '' : 'hidden' }}" data-company-page aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                            @foreach ($page as $company)
+                                <a href="{{ route('home', ['q' => $company->name]) }}#viec-lam" aria-label="Xem việc làm tại {{ $company->name }}" title="{{ $company->name }}" class="group grid min-h-32 place-items-center rounded-2xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md sm:min-h-36 sm:p-6">
+                                    <img src="{{ $company->logo ?: asset('images/default-company-logo.svg') }}" alt="Logo {{ $company->name }}" loading="lazy" class="h-16 w-full object-contain transition duration-300 group-hover:scale-105 sm:h-20">
+                                </a>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+
+                @if ($companyPages->count() > 1)
+                    <div class="mt-5 flex justify-center gap-2" aria-label="Chọn trang nhà tuyển dụng">
+                        @foreach ($companyPages as $page)
+                            <button type="button" aria-label="Trang nhà tuyển dụng {{ $loop->iteration }}" aria-current="{{ $loop->first ? 'true' : 'false' }}" data-company-dot="{{ $loop->index }}" class="h-2.5 rounded-full transition-all {{ $loop->first ? 'w-7 bg-sky-700' : 'w-2.5 bg-sky-200 hover:bg-sky-400' }}"></button>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endif    <section id="nha-tuyen-dung" class="scroll-mt-14 bg-flap text-ink">
         <div class="mx-auto max-w-6xl px-4 py-14">
             <h2 class="max-w-3xl font-signage text-4xl leading-[1.1] font-extrabold tracking-wide uppercase sm:text-5xl">Đưa vị trí của bạn lên bảng qua ba ga</h2>
             <ol class="route mt-8 grid gap-8 md:grid-cols-3">

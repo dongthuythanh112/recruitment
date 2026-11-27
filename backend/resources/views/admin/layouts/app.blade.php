@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') - Quản trị tuyển dụng</title>
     <meta name="theme-color" content="#f3f8fc">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/client-board.js'])
 </head>
 <body class="bg-board font-client text-ink antialiased">
 @php

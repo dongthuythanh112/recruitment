@@ -16,7 +16,7 @@
 <body class="bg-board font-client text-paper antialiased">
     <a href="#noi-dung" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-20 focus:rounded focus:bg-flap focus:px-3 focus:py-2 focus:text-ink">Đến nội dung chính</a>
 
-    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur">
+    <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
             <a href="{{ route('home') }}" class="flex min-h-11 items-center gap-2 font-signage text-2xl font-extrabold tracking-wide whitespace-nowrap uppercase">
                 <span aria-hidden="true" class="grid size-8 place-items-center rounded-full bg-flap text-lg text-ink">V</span>

@@ -10,6 +10,7 @@ use App\Models\Job;
 use App\Models\User;
 use App\Services\JobRecommendationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -36,9 +37,17 @@ class HomeController extends Controller
             && $request->user()?->status === User::STATUS_ACTIVE
                 ? ($request->user()->candidateProfile()->with('skills')->first() ?? new CandidateProfile())
                 : null;
-        $jobSuggestions = $candidate
-            ? $recommendations->recommend($candidate)
-            : ['matched' => collect(), 'featured' => collect()];
+        $jobSuggestions = $recommendations->recommend($candidate, PHP_INT_MAX);
+        $savedJobIds = $candidate && $candidate->exists
+            ? $candidate->savedJobs()->pluck('jobs.id')->map(fn ($id) => (int) $id)->all()
+            : [];
+        $homeSuggestions = $jobSuggestions['matched']->map(fn (array $suggestion) => [
+            'job' => $suggestion['job'],
+            'reasons' => $suggestion['reasons'],
+        ])->concat($jobSuggestions['featured']->map(fn (Job $job) => ['job' => $job, 'reasons' => []]))
+            ->sortByDesc(fn (array $suggestion) => $suggestion['job']->published_at?->timestamp ?? 0)
+            ->take(3)
+            ->values();
 
         $jobs = Job::published()
             ->with('company')
@@ -48,15 +57,15 @@ class HomeController extends Controller
             ->when($filters['location'] ?? null, fn ($query, $location) => $query->where('location', 'like', "%{$location}%"))
             ->when($industry, fn ($query) => $query->whereIn('industry_id', $industry->selfAndDescendantIds()))
             ->latest('published_at')
-            ->paginate(12)
+            ->paginate(9)
             ->withQueryString()
             ->fragment('viec-lam');
 
         return view('client.home', [
             'jobs' => $jobs,
             'candidate' => $candidate,
-            'recommendedJobs' => $jobSuggestions['matched'],
-            'featuredJobs' => $jobSuggestions['featured'],
+            'savedJobIds' => $savedJobIds,
+            'homeSuggestions' => $homeSuggestions,
             'isFiltered' => array_filter($filters) !== [],
             'openJobsCount' => Job::published()->count(),
             'hiringCompaniesCount' => Job::published()->distinct()->count('company_id'),
@@ -68,7 +77,7 @@ class HomeController extends Controller
                 ->withCount(['jobs as open_jobs_count' => fn ($query) => $query->published()])
                 ->orderByDesc('open_jobs_count')
                 ->orderBy('name')
-                ->limit(6)
+                ->limit(10)
                 ->get(),
         ]);
     }
@@ -97,7 +106,31 @@ class HomeController extends Controller
 
         return $industries->filter(fn (Industry $industry) => $industry->open_jobs_count > 0)
             ->sortByDesc('open_jobs_count')
-            ->take(8)
+            ->take(16)
+            ->each(fn (Industry $industry) => $industry->setAttribute('home_icon', $this->industryIcon($industry->name)))
             ->values();
+    }
+
+    private function industryIcon(string $name): string
+    {
+        $name = Str::ascii(mb_strtolower($name));
+
+        return match (true) {
+            Str::contains($name, ['cong nghe', 'phan mem', 'lap trinh', 'it ', 'du lieu', 'data']) => 'technology',
+            Str::contains($name, ['tai chinh', 'ke toan', 'ngan hang', 'bao hiem']) => 'finance',
+            Str::contains($name, ['marketing', 'truyen thong', 'quang cao', 'pr ', 'content']) => 'marketing',
+            Str::contains($name, ['thiet ke', 'design', 'my thuat', 'sang tao']) => 'design',
+            Str::contains($name, ['y te', 'duoc', 'dieu duong', 'suc khoe', 'bac si']) => 'health',
+            Str::contains($name, ['giao duc', 'dao tao', 'giang day', 'gia su']) => 'education',
+            Str::contains($name, ['van tai', 'logistics', 'giao nhan', 'kho van']) => 'logistics',
+            Str::contains($name, ['nha hang', 'khach san', 'du lich', 'am thuc']) => 'hospitality',
+            Str::contains($name, ['nhan su', 'hanh chinh', 'tuyen dung']) => 'people',
+            Str::contains($name, ['phap ly', 'luat']) => 'legal',
+            Str::contains($name, ['xay dung', 'bat dong san', 'kien truc']) => 'building',
+            Str::contains($name, ['co khi', 'san xuat', 'tu dong hoa', 'ky thuat']) => 'engineering',
+            Str::contains($name, ['kinh doanh', 'ban hang', 'thuong mai']) => 'sales',
+            Str::contains($name, ['khoa hoc', 'nghien cuu', 'hoa hoc']) => 'science',
+            default => 'briefcase',
+        };
     }
 }

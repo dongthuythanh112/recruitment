@@ -35,6 +35,10 @@
         </div>
     @else
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 sm:px-5">
+                <div><h2 class="text-sm font-bold text-slate-900">Danh sách thông báo</h2><p class="mt-0.5 text-xs text-slate-500">{{ $notifications->firstItem() ?? 0 }}–{{ $notifications->lastItem() ?? 0 }} trên {{ number_format($notifications->total()) }} thông báo</p></div>
+                <span class="rounded-lg bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-800">Trang {{ $notifications->currentPage() }}</span>
+            </div>
             <ul class="divide-y divide-slate-100">
                 @foreach ($notifications as $notification)
                     <li @class([
