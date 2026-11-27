@@ -10,7 +10,7 @@
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-800">Tuyển dụng phù hợp hơn</p>
                     <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Gợi ý ứng viên</h1>
-                    <p class="mt-2 text-sm text-slate-600">Ứng viên đã bật tìm kiếm, được xếp theo mức độ khớp với tiêu chí của bạn.</p>
+                    <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Chỉ hiển thị hồ sơ ứng viên đã bật chế độ tìm kiếm. Hệ thống xếp hạng theo vị trí mong muốn và kinh nghiệm làm việc, địa điểm, số năm kinh nghiệm, mức lương mong muốn và kỹ năng phù hợp.</p>
                 </div>
                 <span class="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">{{ $candidates->total() }} ứng viên phù hợp</span>
             </div>
@@ -19,7 +19,7 @@
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900">Bộ lọc tiêu chí</h2>
-                        <p class="mt-0.5 text-xs text-slate-500">Chọn tin tuyển dụng để lấy yêu cầu làm gợi ý ban đầu, hoặc nhập tiêu chí riêng.</p>
+                        <p class="mt-0.5 text-xs leading-5 text-slate-500">Chọn một tin để đối chiếu. Nếu chưa chọn bộ lọc, hệ thống tự dùng tin đã duyệt mới nhất của bạn; bạn cũng có thể nhập tiêu chí riêng.</p>
                     </div>
                     @if ($hasCriteria)
                         <a href="{{ route('recruiter.candidates.index') }}" class="text-xs font-semibold text-sky-800 hover:text-sky-950">Xóa bộ lọc</a>

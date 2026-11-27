@@ -31,8 +31,11 @@ class CandidateSearchController extends Controller
         $jobs = $request->user()->createdJobs()
             ->with('skills')
             ->orderBy('title')
-            ->get(['id', 'title', 'location', 'experience_years', 'salary_min', 'salary_max']);
-        $selectedJob = isset($data['job_id']) ? $jobs->firstWhere('id', (int) $data['job_id']) : null;
+            ->get(['id', 'title', 'location', 'experience_years', 'salary_min', 'salary_max', 'status', 'published_at']);
+        $hasManualCriteria = collect($data)->except('job_id')->contains(fn ($value) => $value !== null && $value !== '');
+        $selectedJob = isset($data['job_id'])
+            ? $jobs->firstWhere('id', (int) $data['job_id'])
+            : ($hasManualCriteria ? null : $jobs->where('status', Job::STATUS_APPROVED)->sortByDesc('published_at')->first());
         $filters = [
             'job_id' => $selectedJob?->id ?? '',
             'position' => trim($data['position'] ?? '') ?: ($selectedJob?->title ?? ''),
@@ -46,7 +49,7 @@ class CandidateSearchController extends Controller
         $profiles = CandidateProfile::query()
             ->whereIn('id', $searchability->candidateIds())
             ->whereHas('user', fn ($query) => $query->where('status', 'active'))
-            ->with(['user', 'skills'])
+            ->with(['user', 'skills', 'experiences'])
             ->withCount('skills')
             ->latest('updated_at')
             ->get();
@@ -54,10 +57,11 @@ class CandidateSearchController extends Controller
         $rankedCandidates = $profiles
             ->map(function (CandidateProfile $candidate) use ($filters, $hasCriteria, $selectedJob): ?CandidateProfile {
                 $positionMatches = ! $filters['position'] || $this->positionMatches($candidate, $filters['position']);
-                $locationMatches = ! $filters['location'] || $this->locationMatches($candidate->address, $filters['location']);
+                $locationMatches = ! $filters['location'] || ! filled($candidate->address) || $this->locationMatches($candidate->address, $filters['location']);
                 $experience = $candidate->years_of_experience !== null ? (float) $candidate->years_of_experience : null;
                 $experienceMatches = $filters['experience_min'] === null
-                    || ($experience !== null && $experience >= (float) $filters['experience_min']);
+                    || $experience === null
+                    || $experience >= (float) $filters['experience_min'];
                 $salaryMatches = $this->salaryMatches($candidate, $filters['salary_min'], $filters['salary_max']);
 
                 if (! $positionMatches || ! $locationMatches || ! $experienceMatches || ! $salaryMatches) {
@@ -71,16 +75,17 @@ class CandidateSearchController extends Controller
                     $reasons[] = 'Vị trí mong muốn phù hợp';
                     $score += 3;
                 }
-                if ($filters['location']) {
+                if ($filters['location'] && filled($candidate->address) && $this->locationMatches($candidate->address, $filters['location'])) {
                     $reasons[] = 'Địa điểm phù hợp';
-                    $score += 1;
+                    $score += 2;
                 }
-                if ($filters['experience_min'] !== null && $experience !== null) {
+                if ($filters['experience_min'] !== null && $experience !== null && $experience >= (float) $filters['experience_min']) {
                     $reasons[] = 'Đạt kinh nghiệm yêu cầu';
                     $score += 2;
                 }
                 if (($filters['salary_min'] !== null || $filters['salary_max'] !== null)
-                    && ($candidate->desired_salary_min !== null || $candidate->desired_salary_max !== null)) {
+                    && ($candidate->desired_salary_min !== null || $candidate->desired_salary_max !== null)
+                    && $this->salaryMatches($candidate, $filters['salary_min'], $filters['salary_max'])) {
                     $reasons[] = 'Mức lương mong muốn phù hợp';
                     $score += 2;
                 }
@@ -133,6 +138,7 @@ class CandidateSearchController extends Controller
         $candidateText = $this->normalize(implode(' ', [
             $candidate->desired_position ?? '',
             $candidate->skills->pluck('name')->implode(' '),
+            $candidate->experiences->pluck('position')->implode(' '),
         ]));
         $query = $this->normalize($position);
 
